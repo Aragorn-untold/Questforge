@@ -1,30 +1,29 @@
 # QuestForge
 
-QuestForge is a Django application for managing tabletop fantasy campaigns. Game masters can organize a campaign and its characters, items, quests, monsters, and private notes. Players can browse campaigns, join with a character, manage their character’s details, and chat with the community in the Tavern.
+QuestForge is a Django application for managing tabletop fantasy campaigns. Game masters can organize campaigns, characters, items, quests, monsters, and private campaign notes. Players can discover campaigns, join with a character, manage their profile, and talk with the community in the Tavern.
 
-For the app structure and entity relationships, see [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md).
+See [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) for the app structure, data relationships, permissions, and pre-deployment configuration notes.
 
 ## Features
 
-- Browse and search campaigns, items, quests, and monsters.
+- Browse and search campaigns, reusable items, quests, and monsters.
 - Create campaigns and manage them as the game master.
-- Join a campaign as a player.
-- Game masters can add campaign-specific items, quests, and monsters, using the reusable catalogs as a starting point.
-- Game masters can keep private campaign notes for their own reference.
-- A player can create only one character per campaign, and ended campaigns cannot be joined.
-- Players can leave a campaign by confirming deletion of their character.
-- Visit the Tavern to read community messages; signed-in users can post, edit, and delete their own messages.
-- View profiles, created campaigns, joined campaigns, and characters.
-- See community and campaign counts on the home page.
+- Add campaign-specific items, quests, and monsters from reusable catalogs.
+- Keep campaign notes visible only to the game master.
+- Join a campaign with one character per player; ended campaigns cannot be joined.
+- View profiles, campaigns, and characters associated with a user.
+- Read and post messages in the site-wide Tavern.
+- View campaign and player counts on the home page.
 
 ## Tech stack
 
 - Python 3.10 or newer
 - Django 5.2
-- SQLite by default
+- SQLite for development; PostgreSQL for the provided production settings
 - Django templates, Bootstrap 4.5, and project JavaScript in `static/js/`
+- WhiteNoise for serving collected static files
 
-## Run locally
+## Local development
 
 From the repository root, create and activate a virtual environment:
 
@@ -33,13 +32,13 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-On Windows PowerShell, activate it with:
+On Windows PowerShell:
 
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
 
-Install the dependencies, create the database tables, and start the development server:
+Install dependencies, apply migrations, and run the local development server:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -47,33 +46,31 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Open <http://127.0.0.1:8000/> for the home page. Campaigns are listed at <http://127.0.0.1:8000/campaigns/>.
+`manage.py` defaults to `core.settings.dev`, which uses SQLite and enables Django debug mode. Open <http://127.0.0.1:8000/> for the home page. Campaigns are listed at <http://127.0.0.1:8000/campaigns/>.
 
-Run the project test suite with:
+Run the project tests with:
 
 ```bash
 python manage.py test
 ```
 
-## Load the sample fixture
+## Sample database fixture
 
-The repository includes `fixtures/db.json`, a snapshot of the current local database. Start with an empty or freshly migrated database, then load the fixture:
+The repository includes `fixtures/db.json`, a snapshot of the local sample database. Apply migrations before loading it into a fresh development database:
 
 ```bash
 python manage.py migrate
 python manage.py loaddata fixtures/db.json
 ```
 
-The fixture includes the test accounts below. Loading it into a database that already contains records with the same primary keys can cause conflicts; use a fresh local database for a clean restore.
-
-### Test accounts
+The fixture contains the development accounts below. Use a fresh local database to avoid primary-key conflicts.
 
 | Role | Username | Password |
 | --- | --- | --- |
 | Admin | `admin` | `ghblehrb12` |
 | Regular user | `Grob` | `ghblehrb12` |
 
-These credentials are for local development and testing only.
+These credentials are for local development and testing only. Do not load this fixture or use these credentials in a public or production environment.
 
 ## Main pages
 
@@ -82,18 +79,39 @@ These credentials are for local development and testing only.
 | `/` | Home page and community counts |
 | `/accounts/` | Registration, login, profiles, and account pages |
 | `/campaigns/` | Campaign list, search, creation, and details |
-| `/tavern/` | Community message feed and chat |
+| `/tavern/` | Community message feed |
 | `/items/` | Reusable item catalog |
 | `/quests/` | Reusable quest catalog |
 | `/monsters/` | Reusable monster catalog |
 | `/hello-there/admin/` | Django administration site |
 
-Campaign-specific characters and content are reached from campaign pages. Only the game master can update or delete the campaign and manage its items, quests, monsters, and private notes. Players need an account to join a campaign.
+Campaign-specific characters and content are managed from campaign pages. Only the game master can update or delete a campaign or manage its campaign-specific content and notes. Players must sign in to join a campaign.
 
-## Registration and email
+## Settings and pre-deployment setup
 
-New registrations create inactive accounts. The activation link is printed to the development server console; email delivery is not configured.
+Settings are split across `core/settings/base.py`, `core/settings/dev.py`, and `core/settings/prod.py`. The local `manage.py` command defaults to `core.settings.dev`. Select `core.settings.prod` by setting `DJANGO_SETTINGS_MODULE` in the process environment before starting the application. The production settings use PostgreSQL and require these environment variables:
 
-## Configuration
+- `DJANGO_SECRET_KEY`
+- `POSTGRES_DB`
+- `POSTGRES_DB_PORT`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_HOST`
 
-Settings are in `core/settings.py`. The checked-in configuration is for local development and is not suitable for production. Configure secure production settings before deployment.
+`.env.sample` lists the expected variables. Copy it to `.env` for local environment-variable loading and replace each placeholder. The `DJANGO_SETTINGS_MODULE` selection must be present in the process environment before Django starts; setting it only in `.env` is too late for the current `manage.py`, WSGI, or ASGI startup defaults. A deployment platform should set it directly to `core.settings.prod`.
+
+Before deployment, review `ALLOWED_HOSTS` in `core/settings/prod.py` and set it to the real host names. Production settings currently enforce HTTPS redirects and secure session/CSRF cookies. Configure the hosting platform or reverse proxy to provide HTTPS correctly. The current production settings are a starting point and need to be reviewed against the deployment environment before public launch.
+
+WhiteNoise serves static assets collected under `STATIC_ROOT`. Build the production static directory after installing dependencies and selecting production settings:
+
+```bash
+python manage.py collectstatic --noinput
+```
+
+Repeat this when static assets change. `STATIC_ROOT` is `staticfiles/`; `static/` contains the source CSS and JavaScript.
+
+## Known pre-deployment limitations
+
+- Registration currently creates accounts as active, while the activation view and email service are placeholders. Registration messaging refers to email activation, but no activation email is sent and the activation flow is not implemented.
+- Production `ALLOWED_HOSTS` currently contains only localhost addresses and must be changed for the deployed domain.
+- The fixture credentials are public development data and must never be used in production.

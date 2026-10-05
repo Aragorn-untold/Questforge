@@ -14,6 +14,9 @@ class MessageListView(generic.ListView):
     ordering = ("-created_at", "-pk")
     paginate_by = 30
 
+    def get_queryset(self):
+        return super().get_queryset().select_related("user")
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["message_form"] = MessageForm()

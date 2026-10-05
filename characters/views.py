@@ -12,7 +12,9 @@ class CharacterListView(generic.ListView):
     model = Character
 
     def get_queryset(self):
-        return Character.objects.filter(campaign_id=self.kwargs["campaign_pk"])
+        return Character.objects.filter(
+            campaign_id=self.kwargs["campaign_pk"]
+        ).select_related("player", "race", "character_class")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -24,7 +26,7 @@ class CharacterListView(generic.ListView):
             if profile_pk and profile_pk.isdigit() else None
         )
         context["user_character"] = (
-            campaign.characters.filter(player=self.request.user).first()
+            campaign.characters.filter(player=self.request.user).exists()
             if self.request.user.is_authenticated else None
         )
         return context
@@ -51,7 +53,9 @@ class CharacterCreateView(LoginRequiredMixin, generic.CreateView):
     fields = ("name", "race", "character_class", "gender", "bio")
 
     def dispatch(self, request, *args, **kwargs):
-        self.campaign = get_object_or_404(Campaign, pk=kwargs["campaign_pk"])
+        self.campaign = get_object_or_404(
+            Campaign.objects.select_related("creator"), pk=kwargs["campaign_pk"]
+        )
         if self.campaign.is_active == Campaign.ActiveChoice.ENDED:
             return redirect(self.campaign.get_absolute_url())
         if not request.user.is_authenticated:
@@ -79,7 +83,9 @@ class CharacterUpdateView(LoginRequiredMixin, generic.UpdateView):
     fields = ("name", "race", "character_class", "gender", "bio")
 
     def get_queryset(self):
-        return Character.objects.filter(player=self.request.user)
+        return Character.objects.filter(player=self.request.user).select_related(
+            "campaign"
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -97,7 +103,7 @@ class CharacterDeleteView(LoginRequiredMixin, generic.DeleteView):
     def get_queryset(self):
         return Character.objects.filter(
             campaign_id=self.kwargs["campaign_pk"], player=self.request.user
-        )
+        ).select_related("campaign")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -25,9 +25,7 @@ class CampaignNoteUpdateView(CampaignNoteMembershipMixin, generic.UpdateView):
     template_name = "campaigns/campaignnote_form.html"
 
     def get_queryset(self):
-        return CampaignNote.objects.filter(campaign=self.campaign).select_related(
-            "campaign", "user"
-        )
+        return CampaignNote.objects.filter(campaign=self.campaign)
 
     def test_func(self):
         note = self.get_object()
@@ -42,9 +40,7 @@ class CampaignNoteDeleteView(CampaignNoteMembershipMixin, generic.DeleteView):
     template_name = "campaigns/campaignnote_confirm_delete.html"
 
     def get_queryset(self):
-        return CampaignNote.objects.filter(campaign=self.campaign).select_related(
-            "campaign", "user"
-        )
+        return CampaignNote.objects.filter(campaign=self.campaign)
 
     def test_func(self):
         note = self.get_object()

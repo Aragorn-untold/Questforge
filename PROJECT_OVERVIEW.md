@@ -1,6 +1,6 @@
 # QuestForge project overview
 
-QuestForge is a Django application for managing tabletop fantasy campaigns. It includes accounts and profiles, campaigns and characters, reusable catalogs for items, quests, and monsters, private game-master campaign notes, and a site-wide chat called the Tavern. The home page shows the current campaign and user counts.
+QuestForge is a deployed Django application for managing tabletop fantasy campaigns. The live site is [questforge-l9d4.onrender.com](https://questforge-l9d4.onrender.com/). It includes accounts and profiles, campaigns and characters, reusable catalogs for items, quests, and monsters, private game-master campaign notes, and a site-wide chat called the Tavern. The home page shows the current campaign and user counts.
 
 ## Application structure
 
@@ -24,7 +24,7 @@ flowchart LR
     Chats --> Views
 
     Views --> Models[Models and relationships]
-    Models <--> Database[(SQLite in development / PostgreSQL in production settings)]
+    Models <--> Database[(SQLite in development / PostgreSQL in production)]
     Views --> Templates[HTML templates]
     Templates --> Browser[Rendered pages]
     CSS[static/css/styles.css] --> Browser
@@ -81,9 +81,9 @@ Settings are split into:
 - `core/settings/dev.py`: local SQLite database and `DEBUG = True`.
 - `core/settings/prod.py`: PostgreSQL connection from environment variables, `DEBUG = False`, and HTTPS redirects with secure session and CSRF cookies.
 
-`manage.py` defaults to `core.settings.dev`. The WSGI and ASGI entry points default to `core.settings`; deployment must set `DJANGO_SETTINGS_MODULE=core.settings.prod` in the process environment before starting the application. The `.env.sample` file lists the database and secret-key variables used by the production settings. Its current `DJANGO_SETTINGS_MODULE` placeholder does not change the module selection when it is read only after Django startup begins.
+`manage.py` defaults to `core.settings.dev`. The WSGI and ASGI entry points default to `core.settings`; the deployed service must set `DJANGO_SETTINGS_MODULE=core.settings.prod` in its process environment before starting the application. The `.env.sample` file lists the database, secret-key, settings-module, and Render hostname variables. The settings module must be set in the service environment before Django starts; setting it only in `.env` is too late for startup selection.
 
-The production settings currently allow only `127.0.0.1` and `localhost`; update `ALLOWED_HOSTS` for the deployment domain before launch. HTTPS redirect and secure-cookie settings assume the deployed site is served over correctly configured HTTPS. Review the settings for the target host and proxy before public deployment.
+Production settings use PostgreSQL environment variables, set `DEBUG = False`, and enforce HTTPS redirects and secure session/CSRF cookies. The production `ALLOWED_HOSTS` list uses Render's `RENDER_EXTERNAL_HOSTNAME`. Add any custom domain to the allowed hosts configuration before using it. Set a unique `DJANGO_SECRET_KEY` in Render; the fallback in shared settings is for local development only.
 
 WhiteNoise middleware is configured immediately after Django's `SecurityMiddleware`. Source static assets are in `static/`, and collected assets are written to `staticfiles/` (`STATIC_ROOT`). Run the following with production settings during the deployment build, and whenever static assets change:
 
@@ -104,11 +104,11 @@ python manage.py loaddata fixtures/db.json
 
 The fixture contains development accounts `admin` / `ghblehrb12` (administrator) and `Grob` / `ghblehrb12` (regular user). These credentials and data are for local testing only. Never use them in a public environment.
 
-## Known pre-deployment limitations
+## Deployment notes
 
 - Registration currently creates active accounts. The activation view and email service are placeholders, although the registration message still instructs users to check email. Email delivery and account activation need implementation or the messaging needs to be revised.
-- Production host names have not yet been configured; `ALLOWED_HOSTS` is currently localhost-only.
-- Production startup requires `DJANGO_SETTINGS_MODULE=core.settings.prod` to be set outside the current `.env` loading path.
+- Custom domains must be included in the production host allowlist.
+- Production startup requires the Render service environment to select `DJANGO_SETTINGS_MODULE=core.settings.prod` and provide the database and secret-key variables.
 
 ## Main pages
 

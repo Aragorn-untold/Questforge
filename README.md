@@ -2,7 +2,7 @@
 
 QuestForge is a Django application for managing tabletop fantasy campaigns. Game masters can organize campaigns, characters, items, quests, monsters, and private campaign notes. Players can discover campaigns, join with a character, manage their profile, and talk with the community in the Tavern.
 
-See [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) for the app structure, data relationships, permissions, and pre-deployment configuration notes.
+The deployed application is available at <https://questforge-l9d4.onrender.com/>. See [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) for the app structure, data relationships, permissions, and deployment configuration.
 
 ## Features
 
@@ -87,7 +87,7 @@ These credentials are for local development and testing only. Do not load this f
 
 Campaign-specific characters and content are managed from campaign pages. Only the game master can update or delete a campaign or manage its campaign-specific content and notes. Players must sign in to join a campaign.
 
-## Settings and pre-deployment setup
+## Settings and deployment
 
 Settings are split across `core/settings/base.py`, `core/settings/dev.py`, and `core/settings/prod.py`. The local `manage.py` command defaults to `core.settings.dev`. Select `core.settings.prod` by setting `DJANGO_SETTINGS_MODULE` in the process environment before starting the application. The production settings use PostgreSQL and require these environment variables:
 
@@ -98,9 +98,9 @@ Settings are split across `core/settings/base.py`, `core/settings/dev.py`, and `
 - `POSTGRES_PASSWORD`
 - `POSTGRES_HOST`
 
-`.env.sample` lists the expected variables. Copy it to `.env` for local environment-variable loading and replace each placeholder. The `DJANGO_SETTINGS_MODULE` selection must be present in the process environment before Django starts; setting it only in `.env` is too late for the current `manage.py`, WSGI, or ASGI startup defaults. A deployment platform should set it directly to `core.settings.prod`.
+`.env.sample` lists the expected variables. Copy it to `.env` for local environment-variable loading and replace each placeholder. The `DJANGO_SETTINGS_MODULE` selection must be present in the process environment before Django starts; setting it only in `.env` is too late for the current `manage.py`, WSGI, or ASGI startup defaults. The deployed service should use `core.settings.prod`.
 
-Before deployment, review `ALLOWED_HOSTS` in `core/settings/prod.py` and set it to the real host names. Production settings currently enforce HTTPS redirects and secure session/CSRF cookies. Configure the hosting platform or reverse proxy to provide HTTPS correctly. The current production settings are a starting point and need to be reviewed against the deployment environment before public launch.
+The production settings build `ALLOWED_HOSTS` from Render's `RENDER_EXTERNAL_HOSTNAME` environment variable. If the service uses a custom domain, make sure that hostname is also allowed. Production settings enforce HTTPS redirects and secure session/CSRF cookies. The production secret key must be set through `DJANGO_SECRET_KEY`; do not rely on the development fallback in `base.py`.
 
 WhiteNoise serves static assets collected under `STATIC_ROOT`. Build the production static directory after installing dependencies and selecting production settings:
 
@@ -110,8 +110,8 @@ python manage.py collectstatic --noinput
 
 Repeat this when static assets change. `STATIC_ROOT` is `staticfiles/`; `static/` contains the source CSS and JavaScript.
 
-## Known pre-deployment limitations
+## Deployment notes
 
 - Registration currently creates accounts as active, while the activation view and email service are placeholders. Registration messaging refers to email activation, but no activation email is sent and the activation flow is not implemented.
-- Production `ALLOWED_HOSTS` currently contains only localhost addresses and must be changed for the deployed domain.
+- The production host allowlist uses Render's generated hostname; custom domains need to be allowed as well.
 - The fixture credentials are public development data and must never be used in production.

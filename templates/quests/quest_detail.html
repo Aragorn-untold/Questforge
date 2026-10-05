@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}<title>{{ object.title }} | Quests | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 quest-page">
+    <a href="{% url 'quests:quest-list' %}" class="text-muted small">← Back to quests</a>
+
+    <article class="card quest-detail-card border-0 shadow-sm mt-3">
+      <div class="quest-detail-hero p-4 p-lg-5">
+        <span class="quest-eyebrow">Quest details</span>
+        <h1 class="display-4 mt-2 mb-3">{{ object.title }}</h1>
+        <div class="d-flex flex-wrap align-items-center">
+          {% if object.difficulty_rating == 'EASY' %}
+            <span class="badge badge-success mr-2">{{ object.get_difficulty_rating_display }}</span>
+          {% elif object.difficulty_rating == 'MEDIUM' %}
+            <span class="badge badge-info mr-2">{{ object.get_difficulty_rating_display }}</span>
+          {% elif object.difficulty_rating == 'HARD' %}
+            <span class="badge badge-warning mr-2">{{ object.get_difficulty_rating_display }}</span>
+          {% else %}
+            <span class="badge badge-danger mr-2">{{ object.get_difficulty_rating_display }}</span>
+          {% endif %}
+          <span class="text-light">Recommended level: <strong>{{ object.level_recommendation }}</strong></span>
+        </div>
+      </div>
+
+      <div class="card-body p-4 p-lg-5">
+        <div class="row">
+          <section class="col-lg-8 mb-4 mb-lg-0">
+            <h2 class="h4">The adventure</h2>
+            <div class="quest-prose">{{ object.description|linebreaks }}</div>
+          </section>
+          <aside class="col-lg-4">
+            <div class="quest-reward-card p-4">
+              <span class="quest-eyebrow">For your troubles</span>
+              <h2 class="h4 mt-2">Reward</h2>
+              <div>{{ object.reward_description|linebreaks }}</div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </article>
+  </main>
+{% endblock %}

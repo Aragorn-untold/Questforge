@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}<title>{{ object.username }} | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 user-profile-page">
+    <section class="user-profile-hero p-4 p-lg-5 mb-4">
+      <div class="d-flex flex-column flex-sm-row align-items-sm-center">
+        <div class="flex-grow-1">
+          <span class="user-profile-eyebrow">Adventurer profile</span>
+          {% if object.first_name or object.last_name %}
+            <h1 class="display-4 mb-1">{{ object.first_name }} {{ object.last_name }}</h1>
+            <p class="text-muted mb-1">@{{ object.username }}</p>
+          {% else %}
+            <h1 class="display-4 mb-1">{{ object.username }}</h1>
+          {% endif %}
+          <p class="mb-0">Joined {{ object.date_joined|date:"F j, Y" }}</p>
+        </div>
+        {% if request.user == object %}
+          <a href="{% url 'accounts:user-update' pk=object.pk %}" class="btn btn-light mt-3 mt-sm-0">Edit profile</a>
+        {% endif %}
+      </div>
+    </section>
+
+    <div class="row">
+      <aside class="col-lg-4 mb-4">
+        <section class="card border-0 shadow-sm user-profile-card h-100">
+          <div class="card-body p-4">
+            <h2 class="h5 mb-3">About</h2>
+            {% if user_profile and user_profile.bio %}
+              <div class="text-muted user-bio">{{ user_profile.bio|linebreaks }}</div>
+            {% else %}
+              <p class="text-muted">No bio added yet.</p>
+            {% endif %}
+            <hr>
+            <dl class="user-profile-facts mb-0">
+              {% if request.user == object %}<dt>Email</dt><dd>{{ object.email|default:"—" }}</dd>{% endif %}
+              <dt>Gender</dt><dd>{% if user_profile %}{{ user_profile.get_gender_display|default:"—" }}{% else %}—{% endif %}</dd>
+              <dt>Birthday</dt><dd>{% if user_profile and user_profile.birthday %}{{ user_profile.birthday|date:"F j, Y" }}{% else %}—{% endif %}</dd>
+              <dt>Last seen</dt><dd>{% if user_profile and user_profile.last_seen %}{{ user_profile.last_seen|date:"M j, Y · H:i" }}{% else %}—{% endif %}</dd>
+            </dl>
+          </div>
+        </section>
+      </aside>
+
+      <div class="col-lg-8">
+        <section class="card border-0 shadow-sm user-profile-card mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h4 mb-0">Created campaigns</h2>
+              <span class="badge badge-light px-3 py-2">{{ created_campaigns|length }}</span>
+            </div>
+            <div class="row">
+              {% for campaign in created_campaigns %}
+                <div class="col-md-6 mb-3">
+                  <a href="{{ campaign.get_absolute_url }}?from_profile={{ object.pk }}" class="user-activity-card d-block h-100 p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <h3 class="h5 text-dark">{{ campaign.title }}</h3>
+                      <span class="badge badge-info">{{ campaign.get_is_active_display }}</span>
+                    </div>
+                    <p class="small text-muted mb-0">{{ campaign.description|truncatechars:110 }}</p>
+                  </a>
+                </div>
+              {% empty %}
+                <div class="col-12"><p class="text-muted mb-0">No campaigns created yet.</p></div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+
+        <section class="card border-0 shadow-sm user-profile-card mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h4 mb-0">Campaigns joined</h2>
+              <span class="badge badge-light px-3 py-2">{{ participating_campaigns|length }}</span>
+            </div>
+            <div class="row">
+              {% for campaign in participating_campaigns %}
+                <div class="col-md-6 mb-3">
+                  <a href="{{ campaign.get_absolute_url }}?from_profile={{ object.pk }}" class="user-activity-card d-block h-100 p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <h3 class="h5 text-dark">{{ campaign.title }}</h3>
+                      <span class="badge badge-info">{{ campaign.get_is_active_display }}</span>
+                    </div>
+                    <p class="small text-muted mb-0">{{ campaign.description|truncatechars:110 }}</p>
+                  </a>
+                </div>
+              {% empty %}
+                <div class="col-12"><p class="text-muted mb-0">No campaign characters yet.</p></div>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+
+        <section class="card border-0 shadow-sm user-profile-card mb-4">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="h4 mb-0">Characters</h2>
+              <span class="badge badge-light px-3 py-2">{{ created_characters|length }}</span>
+            </div>
+            <div class="list-group list-group-flush">
+              {% for character in created_characters %}
+                <a href="{% url 'campaigns:characters:character-detail' campaign_pk=character.campaign.pk pk=character.pk %}?from_profile={{ object.pk }}"
+                   class="list-group-item list-group-item-action px-0">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong>{{ character.name }}</strong>
+                      <div class="small text-muted">{{ character.campaign.title }}</div>
+                    </div>
+                    <span class="badge badge-light">Level {{ character.level }} · {{ character.race.name }} {{ character.character_class.name }}</span>
+                  </div>
+                </a>
+              {% empty %}
+                <p class="text-muted mb-0">No characters created yet.</p>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <a href="{% url 'accounts:user-list' %}" class="btn btn-outline-secondary">Back to users</a>
+  </main>
+{% endblock %}

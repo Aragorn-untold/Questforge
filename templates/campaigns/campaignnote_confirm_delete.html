@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Delete campaign note | QuestForge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-5 campaign-note-form-page">
+    <a class="campaign-back-link" href="{{ campaign.get_absolute_url }}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}#campaign-notes">← Back to {{ campaign.title }}</a>
+    <section class="campaign-note-form-card campaign-note-delete-card mt-4">
+      <p class="campaign-section-eyebrow">{{ campaign.title }}</p>
+      <h1>Delete this note?</h1>
+      <p class="campaign-note-delete-preview">“{{ object.content|truncatechars:240 }}”</p>
+      <p class="campaign-note-form-help">This will permanently remove the note from the campaign.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="campaign-note-form-actions">
+          <button class="btn btn-danger" type="submit">Delete note</button>
+          <a class="btn btn-outline-secondary" href="{{ campaign.get_absolute_url }}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}#campaign-notes">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+{% endblock %}

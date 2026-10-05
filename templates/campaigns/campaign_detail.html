@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}<title>{{ object.title }} | QuestForge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 campaign-detail-page">
+    <a href="{% if return_profile_user %}{% url 'accounts:user-detail' pk=return_profile_user.pk %}{% else %}{% url 'campaigns:campaign-list' %}{% endif %}" class="campaign-back-link">
+      <span aria-hidden="true">←</span> {% if return_profile_user %}Back to profile{% else %}Back to campaigns{% endif %}
+    </a>
+
+    <section class="campaign-detail-hero mt-3">
+      <div class="campaign-detail-cover">
+        <div class="campaign-detail-badges">
+          {% if is_campaign_owner %}
+            <span class="campaign-detail-badge campaign-detail-badge-owner">♛ Game master</span>
+          {% else %}
+            <span class="campaign-detail-badge">Campaign</span>
+          {% endif %}
+          <span class="campaign-detail-badge campaign-detail-badge-status status-{{ object.is_active }}">
+            {{ object.get_is_active_display }}
+          </span>
+        </div>
+        <h1>{{ object.title }}</h1>
+      </div>
+      <div class="campaign-detail-toolbar">
+        <div class="campaign-detail-owner">
+          <span class="campaign-detail-avatar" aria-hidden="true">{{ object.creator.username|first|upper }}</span>
+          <span class="campaign-detail-owner-label">Game master:</span>
+          <a href="{% url 'accounts:user-detail' object.creator.pk %}">{{ object.creator.username }}</a>
+        </div>
+        <div class="campaign-detail-actions">
+          <a class="btn btn-outline-secondary" href="{% url 'campaigns:characters:character-list' campaign_pk=object.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">
+            <span aria-hidden="true">♙</span> Party <span class="campaign-action-count">{{ characters|length }}</span>
+          </a>
+          {% if is_campaign_owner %}
+            <a class="btn btn-outline-secondary" href="{% url 'campaigns:campaign-update' object.pk %}">Edit campaign</a>
+            <a class="btn btn-outline-danger" href="{% url 'campaigns:campaign-delete' object.pk %}">Delete</a>
+          {% elif user.is_authenticated %}
+            {% if user_character %}
+              <a class="btn btn-outline-danger" href="{% url 'campaigns:characters:character-delete' campaign_pk=object.pk pk=user_character.pk %}">Leave campaign</a>
+            {% elif object.is_active == "ended" %}
+              <span class="btn btn-outline-secondary disabled" aria-disabled="true">Campaign ended</span>
+            {% else %}
+              <a class="btn btn-primary" href="{% url 'campaigns:characters:character-create' campaign_pk=object.pk %}">Join this campaign</a>
+            {% endif %}
+          {% else %}
+            {% if object.is_active == "ended" %}
+              <span class="btn btn-outline-secondary disabled" aria-disabled="true">Campaign ended</span>
+            {% else %}
+              <a class="btn btn-primary" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Log in to join</a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <nav class="campaign-detail-tabs mt-4" aria-label="Campaign sections">
+      <a class="is-active" href="#campaign-overview">Overview</a>
+      <a href="#campaign-party">Participants <span>{{ characters|length }}</span></a>
+      {% if is_campaign_owner %}
+        <a href="#campaign-inventory">Inventory <span>{{ campaign_items|length }}</span></a>
+        <a href="#campaign-quests">Quests <span>{{ campaign_quests|length }}</span></a>
+        <a href="#campaign-monsters">Monsters <span>{{ campaign_monsters|length }}</span></a>
+      {% endif %}
+      {% if is_campaign_owner %}<a href="#campaign-notes">Notes <span>{{ campaign_notes|length }}</span></a>{% endif %}
+    </nav>
+
+    <section id="campaign-overview" class="campaign-detail-section campaign-overview-section">
+      <p class="campaign-section-eyebrow">Campaign overview</p>
+      <div class="campaign-overview-grid">
+        <article class="campaign-detail-card campaign-description-card">
+          <h2>Description</h2>
+          <p>{{ object.description|linebreaksbr }}</p>
+        </article>
+        <article class="campaign-detail-card campaign-dates-card">
+          <h2>Campaign details</h2>
+          <dl>
+            <div><dt>Status</dt><dd>{{ object.get_is_active_display }}</dd></div>
+            <div><dt>Starts</dt><dd>{% if object.start_date %}{{ object.start_date|date:"M j, Y · H:i" }}{% else %}Not scheduled{% endif %}</dd></div>
+            <div><dt>Updated</dt><dd>{{ object.last_updated|date:"M j, Y" }}</dd></div>
+            {% if object.ended %}<div><dt>Ended</dt><dd>{{ object.ended|date:"M j, Y" }}</dd></div>{% endif %}
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section id="campaign-party" class="campaign-detail-section">
+      <div class="campaign-section-heading">
+        <div>
+          <p class="campaign-section-eyebrow">The adventuring party</p>
+          <h2>Participants</h2>
+        </div>
+        <span class="campaign-section-count">{{ characters|length }}</span>
+      </div>
+      {% if characters %}
+        <div class="campaign-party-list">
+          {% for character in characters %}
+            <a class="campaign-party-member" href="{% url 'campaigns:characters:character-detail' campaign_pk=object.pk pk=character.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">
+              <span class="campaign-detail-avatar" aria-hidden="true">{{ character.name|first|upper }}</span>
+              <span class="campaign-party-info">
+                <strong>{{ character.name }}</strong>
+                <small>{{ character.player.username }}{% if character.player_id == object.creator_id %} · Game master{% endif %}</small>
+              </span>
+              <span class="campaign-party-character">Level {{ character.level }} · {{ character.race.name }} {{ character.character_class.name }}</span>
+              <span class="campaign-party-arrow" aria-hidden="true">→</span>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="campaign-detail-empty">No characters have joined this campaign yet.</div>
+      {% endif %}
+    </section>
+
+    {% if is_campaign_owner %}
+      <section id="campaign-inventory" class="campaign-detail-section">
+        <div class="campaign-section-heading">
+          <div><p class="campaign-section-eyebrow">Equipment and treasure</p><h2>Inventory</h2></div>
+          <span class="campaign-section-count">{{ campaign_items|length }}</span>
+        </div>
+        {% if campaign_items %}
+          <div class="campaign-resource-grid">
+            {% for item in campaign_items %}
+              <article class="campaign-detail-card campaign-resource-card">
+                <div class="campaign-resource-heading"><h3>{{ item.name }}</h3><span>{{ item.get_rarity_display }}</span></div>
+                <p>{{ item.description|truncatechars:180 }}</p>
+                <small>{{ item.get_type_display }}{% if item.damage %} · {{ item.damage }}{% endif %}</small>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="campaign-detail-empty">This campaign has no items yet.</div>
+        {% endif %}
+        <a class="btn btn-outline-secondary mt-3" href="{% url 'campaigns:campaign-item-list' campaign_pk=object.pk %}">Manage campaign items</a>
+      </section>
+
+      <section id="campaign-quests" class="campaign-detail-section">
+        <div class="campaign-section-heading">
+          <div><p class="campaign-section-eyebrow">Stories in this world</p><h2>Quests</h2></div>
+          <span class="campaign-section-count">{{ campaign_quests|length }}</span>
+        </div>
+        {% if campaign_quests %}
+          <div class="campaign-resource-grid">
+            {% for quest in campaign_quests %}
+              <article class="campaign-detail-card campaign-resource-card">
+                <div class="campaign-resource-heading"><h3>{{ quest.title }}</h3><span>{{ quest.get_difficulty_rating_display }}</span></div>
+                <p>{{ quest.description|truncatechars:180 }}</p>
+                <small>Recommended level: {{ quest.level_recommendation }}</small>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="campaign-detail-empty">This campaign has no quests yet.</div>
+        {% endif %}
+        <a class="btn btn-outline-secondary mt-3" href="{% url 'campaigns:campaign-quest-list' campaign_pk=object.pk %}">Manage campaign quests</a>
+      </section>
+
+      <section id="campaign-monsters" class="campaign-detail-section">
+        <div class="campaign-section-heading">
+          <div><p class="campaign-section-eyebrow">Creatures of the realm</p><h2>Monsters</h2></div>
+          <span class="campaign-section-count">{{ campaign_monsters|length }}</span>
+        </div>
+        {% if campaign_monsters %}
+          <div class="campaign-resource-grid">
+            {% for monster in campaign_monsters %}
+              <article class="campaign-detail-card campaign-resource-card">
+                <div class="campaign-resource-heading"><h3>{{ monster.name }}</h3><span>{{ monster.get_challenge_rating_display }}</span></div>
+                <p>{{ monster.get_type_display }} · {{ monster.get_alignment_display }}</p>
+                <small>HP {{ monster.hit_points }} · AC {{ monster.armor_class }}</small>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="campaign-detail-empty">This campaign has no monsters yet.</div>
+        {% endif %}
+        <a class="btn btn-outline-secondary mt-3" href="{% url 'campaigns:campaign-monster-list' campaign_pk=object.pk %}">Manage campaign monsters</a>
+      </section>
+    {% endif %}
+
+    {% if is_campaign_owner %}
+    <section id="campaign-notes" class="campaign-detail-section campaign-notes-section">
+      <div class="campaign-section-heading">
+        <div><p class="campaign-section-eyebrow">Private campaign notes</p><h2>Campaign notes</h2></div>
+        {% if can_access_notes %}<span class="campaign-section-count">{{ campaign_notes|length }}</span>{% endif %}
+      </div>
+      <div class="campaign-notes-layout">
+          <div class="campaign-note-compose">
+            <h3>New note</h3>
+            <form method="post" action="{% url 'campaigns:campaign-note-create' campaign_pk=object.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}#campaign-notes">
+              {% csrf_token %}
+              {% if campaign_note_form.content.errors %}<div class="alert alert-danger">{{ campaign_note_form.content.errors }}</div>{% endif %}
+              {{ campaign_note_form.content }}
+              <button class="btn btn-primary mt-3" type="submit">Add note</button>
+            </form>
+          </div>
+          <div class="campaign-note-list">
+            <h3>Campaign notes <span>{{ campaign_notes|length }}</span></h3>
+            {% for note in campaign_notes %}
+              <article class="campaign-note-card">
+                <div class="campaign-note-card-header">
+                  <span class="campaign-detail-avatar" aria-hidden="true">{{ note.user.username|first|upper }}</span>
+                  <span class="campaign-note-author"><strong>{{ note.user.get_full_name|default:note.user.username }}</strong><small>{{ note.created_at|date:"M j, Y · H:i" }}</small></span>
+                  {% if note.user_id == user.pk or is_campaign_owner %}
+                    <span class="campaign-note-actions">
+                      <a class="campaign-note-action" aria-label="Edit note" title="Edit note" href="{% url 'campaigns:campaign-note-update' campaign_pk=object.pk pk=note.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">✎</a>
+                      <a class="campaign-note-action is-danger" aria-label="Delete note" title="Delete note" href="{% url 'campaigns:campaign-note-delete' campaign_pk=object.pk pk=note.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">⌫</a>
+                    </span>
+                  {% endif %}
+                </div>
+                <div class="campaign-note-content">{{ note.content|linebreaksbr }}</div>
+              </article>
+            {% empty %}
+              <div class="campaign-detail-empty">No notes yet. Add a clue, decision, or moment worth remembering.</div>
+            {% endfor %}
+          </div>
+      </div>
+    </section>
+    {% endif %}
+  </main>
+{% endblock %}

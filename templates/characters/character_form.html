@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Create character | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 character-create-page">
+    <a href="{{ campaign.get_absolute_url }}" class="text-muted small">← Back to campaign</a>
+
+    <div class="character-create-heading mt-3 mb-4 p-4 p-lg-5">
+      <span class="character-create-eyebrow">{% if object %}Shape your hero{% else %}Join the adventure{% endif %}</span>
+      <h1 class="display-4 mt-2 mb-2">{% if object %}Edit your character{% else %}Create your character{% endif %}</h1>
+      <p class="mb-0">{% if object %}Update your character for{% else %}Choose who you’ll become in{% endif %} <strong>{{ campaign.title }}</strong>.</p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm character-form-card">
+          <div class="card-body p-4 p-lg-5">
+            <h2 class="h4 mb-1">Character details</h2>
+            <p class="text-muted mb-4">You can refine your character’s story as the campaign unfolds.</p>
+
+            <form method="post" class="character-form" novalidate>
+              {% csrf_token %}
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+              {% endif %}
+
+              {% for field in form %}
+                <div class="form-group mb-4">
+                  <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+                  {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+              {% endfor %}
+
+              <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-top pt-4 mt-4">
+                <span class="small text-muted mb-3 mb-sm-0">{% if object %}Your changes will be saved to this character.{% else %}Your character will join this campaign when you save.{% endif %}</span>
+                <button type="submit" class="btn btn-primary btn-lg px-4">{% if object %}Save changes{% else %}Create character and join{% endif %}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <aside class="col-lg-4 mb-4">
+        <div class="card border-0 shadow-sm campaign-summary-card">
+          <div class="card-body p-4">
+            <div class="campaign-summary-icon mb-3" aria-hidden="true">✦</div>
+            <p class="text-uppercase text-muted small font-weight-bold mb-1">Joining campaign</p>
+            <h2 class="h4">{{ campaign.title }}</h2>
+            <p class="text-muted">{{ campaign.description|truncatechars:180 }}</p>
+            <hr>
+            <div class="small text-muted">Game master</div>
+            <div class="font-weight-bold">{{ campaign.creator.username }}</div>
+            <div class="small text-muted mt-3">Current status</div>
+            <span class="badge badge-info mt-1">{{ campaign.get_is_active_display }}</span>
+          </div>
+        </div>
+        <div class="character-note mt-3 p-3 small">
+          You can have one character in each campaign. Leaving later removes that character from this campaign.
+        </div>
+      </aside>
+    </div>
+  </main>
+{% endblock %}

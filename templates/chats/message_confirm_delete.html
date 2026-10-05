@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Delete message | Tavern</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-5 tavern-form-page">
+    <a class="tavern-back-link" href="{% url 'chats:chats-message-list' %}">← Back to the Tavern</a>
+    <section class="tavern-edit-card tavern-delete-card mt-4">
+      <p class="tavern-eyebrow">The gathering place</p>
+      <h1>Delete your message?</h1>
+      <blockquote>{{ object.content|truncatechars:240 }}</blockquote>
+      <p class="tavern-form-intro">This will permanently remove your message from the Tavern.</p>
+      <form method="post">
+        {% csrf_token %}
+        <div class="tavern-form-actions">
+          <button class="btn btn-danger" type="submit">Delete message</button>
+          <a class="btn btn-outline-secondary" href="{% url 'chats:chats-message-list' %}">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+{% endblock %}

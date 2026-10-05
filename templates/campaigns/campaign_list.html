@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Campaigns | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+      <div>
+        <p class="text-uppercase text-muted small font-weight-bold mb-1">Your adventures start here</p>
+        <h1 class="display-4 mb-2">Campaigns</h1>
+        <p class="text-muted mb-0">Browse your worlds, gather your party, and continue the story.</p>
+      </div>
+      {% if user.is_authenticated %}
+        <a class="btn btn-primary btn-lg mt-3 mt-md-0" href="{% url 'campaigns:campaign-create' %}">
+          <span aria-hidden="true">＋</span> New campaign
+        </a>
+      {% endif %}
+    </div>
+
+    <form method="get" action="" class="campaign-search-form mb-4">
+      <div class="form-group mb-0">
+        <label class="sr-only" for="id_title">Search campaigns by title</label>
+        {{ campaign_search_form.title }}
+      </div>
+      <button class="btn btn-primary" type="submit">Search</button>
+      {% if clear %}
+        <a class="btn btn-outline-secondary" href="{% url 'campaigns:campaign-list' %}">Clear</a>
+      {% endif %}
+    </form>
+
+    {% if campaign_list %}
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">All campaigns</h2>
+        <span class="badge badge-light px-3 py-2">{{ paginator.count }} total</span>
+      </div>
+      <div class="row">
+        {% for camp in campaign_list %}
+          <div class="col-md-6 col-xl-4 mb-4">
+            <article class="card h-100 border-0 shadow-sm campaign-card">
+              <div class="card-body d-flex flex-column p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <span class="campaign-mark" aria-hidden="true">✦</span>
+                  {% if camp.is_active == 'active' %}
+                    <span class="badge badge-success">{{ camp.get_is_active_display }}</span>
+                  {% elif camp.is_active == 'paused' %}
+                    <span class="badge badge-warning">{{ camp.get_is_active_display }}</span>
+                  {% elif camp.is_active == 'ended' %}
+                    <span class="badge badge-secondary">{{ camp.get_is_active_display }}</span>
+                  {% else %}
+                    <span class="badge badge-info">{{ camp.get_is_active_display }}</span>
+                  {% endif %}
+                </div>
+
+                <h2 class="h4 mb-2">
+                  <a class="text-dark stretched-link" href="{% url 'campaigns:campaign-detail' pk=camp.pk %}">{{ camp.title }}</a>
+                </h2>
+                <p class="text-muted flex-grow-1">{{ camp.description|truncatechars:150 }}</p>
+
+                <div class="campaign-meta border-top pt-3 mt-2">
+                  <div class="d-flex justify-content-between small text-muted">
+                    <span>Game master</span>
+                    <span class="font-weight-bold text-dark">{{ camp.creator.username }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between small text-muted mt-2">
+                    <span>Created</span>
+                    <span>{{ camp.created_at|date:"M j, Y" }}</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm text-center py-5 px-3">
+        <div class="card-body">
+          <div class="campaign-empty-mark mb-3" aria-hidden="true">✦</div>
+          {% if search_query %}
+            <h2 class="h3">No campaigns found</h2>
+            <p class="text-muted mx-auto mb-0" style="max-width: 32rem;">No campaign titles match “{{ search_query }}”. Try another search.</p>
+          {% else %}
+            <h2 class="h3">Your next adventure awaits</h2>
+            <p class="text-muted mx-auto mb-4" style="max-width: 32rem;">
+              There are no campaigns here yet. Create one to start building a world for your party.
+            </p>
+            {% if user.is_authenticated %}
+              <a class="btn btn-primary" href="{% url 'campaigns:campaign-create' %}">Create your first campaign</a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </main>
+{% endblock %}

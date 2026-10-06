@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}<title>QuestForge | Your next adventure begins here</title>{% endblock %}
 
@@ -24,30 +25,9 @@
           {% endif %}
         </div>
       </div>
-      <svg class="home-hero-mark" viewBox="0 0 260 250" aria-hidden="true" focusable="false">
-        <defs>
-          <linearGradient id="die-face-light" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#66552f" />
-            <stop offset="1" stop-color="#171716" />
-          </linearGradient>
-          <linearGradient id="die-face-dark" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#39301f" />
-            <stop offset="1" stop-color="#0a0c0e" />
-          </linearGradient>
-        </defs>
-        <g stroke="#c5a351" stroke-linejoin="round" stroke-width="0.9">
-          <polygon points="105,210 105,129 41,141" fill="#171817" />
-          <polygon points="105,210 105,129 189,168" fill="url(#die-face-dark)" />
-          <polygon points="105,210 189,168 176,204" fill="#342b1c" />
-          <polygon points="155,50 84,56 176,73" fill="url(#die-face-light)" />
-          <polygon points="105,129 41,141 84,56" fill="#262319" />
-          <polygon points="105,129 189,168 176,73" fill="#4c4027" />
-          <polygon points="105,129 84,56 176,73" fill="#6a5830" />
-          <polygon points="219,119 189,168 176,204" fill="#0c0f11" />
-          <polygon points="219,119 189,168 176,73" fill="#282319" />
-          <polygon points="41,141 84,56 155,50 176,73 219,119 176,204 105,210" fill="none" stroke-width="0.9" />
-        </g>
-      </svg>
+      <video class="home-hero-mark" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+        <source src="{% static 'video/d20_dark_v4.webm' %}" type="video/webm">
+      </video>
     </section>
 
     <section class="home-stats mb-5" aria-label="QuestForge community statistics">

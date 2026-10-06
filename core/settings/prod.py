@@ -15,6 +15,10 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     # WhiteNoise must run directly after SecurityMiddleware so it can serve
     # static files before the rest of the request middleware is applied.
+
+    # my middleware
+    "core.middlewares.LastSeenMiddleware",
+
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

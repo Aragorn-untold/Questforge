@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Tavern | QuestForge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 tavern-page">
+    <header class="tavern-hero mb-4">
+      <span class="tavern-hero-mark" aria-hidden="true">✥</span>
+      <div>
+        <p class="tavern-eyebrow">The gathering place</p>
+        <h1>The Tavern</h1>
+        <p class="mb-0">Pull up a chair and share a thought with the QuestForge community.</p>
+      </div>
+      {% if is_paginated %}<span class="tavern-total">{{ paginator.count }} messages</span>{% endif %}
+    </header>
+
+    {% if user.is_authenticated %}
+      <section class="tavern-composer mb-4" aria-labelledby="tavern-compose-title">
+        <div class="tavern-composer-avatar" aria-hidden="true">{{ user.username|first|upper }}</div>
+        <div class="tavern-composer-body">
+          <h2 id="tavern-compose-title">Join the conversation</h2>
+          <form method="post" action="{% url 'chats:chats-message-create' %}">
+            {% csrf_token %}
+            {% if message_form.content.errors %}<div class="tavern-form-errors">{{ message_form.content.errors }}</div>{% endif %}
+            {{ message_form.content }}
+            <div class="tavern-compose-footer">
+              <span>Your message will be visible to everyone.</span>
+              <button class="btn btn-primary" type="submit">Send message <span aria-hidden="true">➤</span></button>
+            </div>
+          </form>
+        </div>
+      </section>
+    {% else %}
+      <div class="tavern-login-callout mb-4">
+        <p>Sign in to join the conversation.</p>
+        <a class="btn btn-primary" href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}">Log in to the Tavern</a>
+      </div>
+    {% endif %}
+
+    <section class="tavern-feed" aria-labelledby="tavern-feed-title">
+      <div class="tavern-feed-heading">
+        <div><p class="tavern-eyebrow">Around the table</p><h2 id="tavern-feed-title">Recent messages</h2></div>
+        {% if is_paginated %}<span>{{ paginator.count }} total</span>{% endif %}
+      </div>
+
+      {% for message in message_list %}
+        <article class="tavern-message-card">
+          <div class="tavern-message-avatar" aria-hidden="true">{{ message.user.username|first|upper }}</div>
+          <div class="tavern-message-main">
+            <header class="tavern-message-header">
+              <strong>{{ message.user.get_full_name|default:message.user.username }}</strong>
+              <time datetime="{{ message.created_at|date:'c' }}">{{ message.created_at|date:"M j, Y · H:i" }}</time>
+              {% if user.is_authenticated and message.user_id == user.pk %}
+                <nav class="tavern-message-actions" aria-label="Message actions">
+                  <a href="{% url 'chats:chats-message-update' message.pk %}" aria-label="Edit message" title="Edit message">Edit</a>
+                  <a href="{% url 'chats:chats-message-delete' message.pk %}" aria-label="Delete message" title="Delete message">Delete</a>
+                </nav>
+              {% endif %}
+            </header>
+            <div class="tavern-message-content">{{ message.content|linebreaksbr }}</div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="tavern-empty">
+          <span aria-hidden="true">✧</span>
+          <h3>The tavern is quiet</h3>
+          <p>Be the first to start a conversation.</p>
+        </div>
+      {% endfor %}
+    </section>
+  </main>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}<title>QuestForge | Your next adventure begins here</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 home-page">
+    <section class="home-hero p-4 p-lg-5 mb-5">
+      <div class="home-hero-content">
+        <p class="home-eyebrow mb-3">A place for every great adventure</p>
+        <h1 class="display-3 mb-3">
+          {% if user.is_authenticated %}
+            Welcome back{% if user.first_name %}, {{ user.first_name }}{% else %}, {{ user.get_username }}{% endif %}.
+          {% else %}
+            Your next adventure starts here.
+          {% endif %}
+        </h1>
+        <p class="home-intro mb-4">QuestForge helps game masters organize campaigns and gives players one place to discover a world, create a character, and follow the story.</p>
+        <div class="d-flex flex-wrap align-items-center home-actions">
+          <a class="btn btn-primary btn-lg" href="{% url 'campaigns:campaign-list' %}">Explore campaigns</a>
+          {% if user.is_authenticated %}
+            <a class="btn btn-outline-secondary btn-lg" href="{% url 'campaigns:campaign-create' %}">Create a campaign</a>
+          {% else %}
+            <a class="btn btn-outline-secondary btn-lg" href="{% url 'accounts:user-register' %}">Join QuestForge</a>
+          {% endif %}
+        </div>
+      </div>
+      <video class="home-hero-mark" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+        <source src="{% static 'video/d20_dark_v4.webm' %}" type="video/webm">
+      </video>
+    </section>
+
+    <section class="home-stats mb-5" aria-label="QuestForge community statistics">
+      <div class="home-stat">
+        <span class="home-stat-value">{{ num_campaigns }}</span>
+        <span class="home-stat-label">Campaign{{ num_campaigns|pluralize }} to explore</span>
+      </div>
+      <span class="home-stat-divider" aria-hidden="true"></span>
+      <div class="home-stat">
+        <span class="home-stat-value">{{ num_players }}</span>
+        <span class="home-stat-label">Player{{ num_players|pluralize }} in the community</span>
+      </div>
+    </section>
+
+    <section class="home-features" aria-labelledby="home-features-heading">
+      <div class="mb-4">
+        <p class="home-eyebrow mb-2">Everything for your table</p>
+        <h2 id="home-features-heading" class="h1 mb-2">Build the world. Play the story.</h2>
+        <p class="text-muted mb-0">Keep campaign details and useful references together, ready for the next session.</p>
+      </div>
+      <div class="row">
+        <div class="col-md-6 col-xl-4 mb-4">
+          <a class="home-feature-card h-100" href="{% url 'campaigns:campaign-list' %}">
+            <span class="home-feature-icon" aria-hidden="true">⌘</span>
+            <h3>Campaigns and parties</h3>
+            <p>Browse campaign worlds, see who is running them, and join a game by creating your character for that campaign.</p>
+            <span class="home-feature-link">Browse campaigns <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+        <div class="col-md-6 col-xl-4 mb-4">
+          <a class="home-feature-card h-100" href="{% url 'compendium:compendium-page' %}">
+            <span class="home-feature-icon" aria-hidden="true">✧</span>
+            <h3>Compendium</h3>
+            <p>Explore items, quests, monsters, and spells to find useful additions for your campaign.</p>
+            <span class="home-feature-link">Explore the Compendium <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+        <div class="col-md-6 col-xl-4 mb-4">
+          <a class="home-feature-card h-100" href="{% url 'chats:chats-message-list' %}">
+            <span class="home-feature-icon" aria-hidden="true">♨</span>
+            <h3>The Tavern</h3>
+            <p>Drop into the community chat to catch up and share a talk. Hot topics and hot meals await you.</p>
+            <span class="home-feature-link">Visit the Tavern <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="home-callout mt-2">
+      <div>
+        <p class="home-eyebrow mb-2">Ready when you are</p>
+        <h2 class="h3 mb-2">Gather your party and begin.</h2>
+        <p class="text-muted mb-0">Find a campaign to join or start building a world of your own.</p>
+      </div>
+      <a class="btn btn-primary" href="{% url 'campaigns:campaign-list' %}">Find a campaign</a>
+    </section>
+  </main>
+{% endblock %}

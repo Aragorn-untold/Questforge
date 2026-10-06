@@ -1,0 +1,18 @@
+<section id="campaign-overview" class="campaign-detail-section campaign-overview-section">
+  <p class="campaign-section-eyebrow">Campaign overview</p>
+  <div class="campaign-overview-grid">
+    <article class="campaign-detail-card campaign-description-card">
+      <h2>Description</h2>
+      <p>{{ object.description|linebreaksbr }}</p>
+    </article>
+    <article class="campaign-detail-card campaign-dates-card">
+      <h2>Campaign details</h2>
+      <dl>
+        <div><dt>Status</dt><dd>{{ object.get_is_active_display }}</dd></div>
+        <div><dt>Starts</dt><dd>{% if object.start_date %}{{ object.start_date|date:"M j, Y · H:i" }}{% else %}Not scheduled{% endif %}</dd></div>
+        <div><dt>Updated</dt><dd>{{ object.last_updated|date:"M j, Y" }}</dd></div>
+        {% if object.ended %}<div><dt>Ended</dt><dd>{{ object.ended|date:"M j, Y" }}</dd></div>{% endif %}
+      </dl>
+    </article>
+  </div>
+</section>

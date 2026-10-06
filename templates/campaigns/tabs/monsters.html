@@ -1,0 +1,20 @@
+<section id="campaign-monsters" class="campaign-detail-section">
+  <div class="campaign-section-heading">
+    <div><p class="campaign-section-eyebrow">Creatures of the realm</p><h2>Monsters</h2></div>
+    <span class="campaign-section-count">{{ campaign_monsters|length }}</span>
+  </div>
+  {% if campaign_monsters %}
+    <div class="campaign-resource-grid">
+      {% for monster in campaign_monsters %}
+        <article class="campaign-detail-card campaign-resource-card">
+          <div class="campaign-resource-heading"><h3>{{ monster.name }}</h3><span>{{ monster.get_challenge_rating_display }}</span></div>
+          <p>{{ monster.get_type_display }} · {{ monster.get_alignment_display }}</p>
+          <small>HP {{ monster.hit_points }} · AC {{ monster.armor_class }}</small>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="campaign-detail-empty">This campaign has no monsters yet.</div>
+  {% endif %}
+  <a class="btn btn-outline-secondary mt-3" href="{% url 'campaigns:campaign-monster-list' campaign_pk=object.pk %}">Manage campaign monsters</a>
+</section>

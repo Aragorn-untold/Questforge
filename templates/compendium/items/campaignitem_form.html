@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  <title>Add Campaign Item | Questforge</title>
+{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  {{ base_items_data|json_script:"base-items-data" }}
+  <script src="{% static 'js/campaign-base-autofill.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-xl-7">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-dark text-white">
+            <h1 class="h3 mb-0">Items in {{ campaign.title }}</h1>
+          </div>
+
+          <div class="card-body">
+            <h2 class="h5">Campaign items</h2>
+            <div class="list-group mb-4">
+              {% for item in campaign_items %}
+                <div class="list-group-item">
+                  <strong>{{ item.name }}</strong>
+                  <span class="text-muted">{{ item.get_type_display }} · {{ item.get_rarity_display }}</span>
+                  <p class="mb-0">{{ item.description }}</p>
+                </div>
+              {% empty %}
+                <div class="list-group-item text-muted">This campaign has no items yet.</div>
+              {% endfor %}
+            </div>
+
+            <h2 class="h5 mb-3">Add an item</h2>
+            <p class="text-muted mb-4">Create a campaign-specific item with custom details.</p>
+
+            <form action="" method="post" novalidate>
+              {% csrf_token %}
+
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+                </div>
+              {% endif %}
+
+              {% for field in form %}
+                <div class="form-group">
+                  <label for="{{ field.id_for_label }}" class="font-weight-bold">
+                    {{ field.label }}
+                  </label>
+
+                  {{ field }}
+
+                  {% if field.help_text %}
+                    <small class="form-text text-muted">
+                      {{ field.help_text }}
+                    </small>
+                  {% endif %}
+
+                  {% for error in field.errors %}
+                    <div class="text-danger small mt-1">
+                      {{ error }}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+
+              <div class="d-flex justify-content-between align-items-center mt-4">
+                <a href="{{ view.campaign.get_absolute_url }}" class="btn btn-outline-secondary">
+                  Cancel
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                  Save Campaign Item
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-4 mb-0">
+          <strong>Tip:</strong> Campaign items can be customized separately from base items.
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

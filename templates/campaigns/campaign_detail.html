@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}<title>{{ object.title }} | QuestForge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 campaign-detail-page">
+    <a href="{% if return_profile_user %}{% url 'accounts:user-detail' pk=return_profile_user.pk %}{% else %}{% url 'campaigns:campaign-list' %}{% endif %}" class="campaign-back-link">
+      <span aria-hidden="true">←</span> {% if return_profile_user %}Back to profile{% else %}Back to campaigns{% endif %}
+    </a>
+
+    <section class="campaign-detail-hero mt-3">
+      <div class="campaign-detail-cover">
+        <div class="campaign-detail-badges">
+          {% if is_campaign_owner %}
+            <span class="campaign-detail-badge campaign-detail-badge-owner">♛ Game master</span>
+          {% else %}
+            <span class="campaign-detail-badge">Campaign</span>
+          {% endif %}
+          <span class="campaign-detail-badge campaign-detail-badge-status status-{{ object.is_active }}">
+            {{ object.get_is_active_display }}
+          </span>
+        </div>
+        <h1>{{ object.title }}</h1>
+      </div>
+      <div class="campaign-detail-toolbar">
+        <div class="campaign-detail-owner">
+          <span class="campaign-detail-avatar" aria-hidden="true">{{ object.creator.username|first|upper }}</span>
+          <span class="campaign-detail-owner-label">Game master:</span>
+          <a href="{% url 'accounts:user-detail' object.creator.pk %}">{{ object.creator.username }}</a>
+        </div>
+        <div class="campaign-detail-actions">
+          <a class="btn btn-outline-secondary" href="{% url 'campaigns:characters:character-list' campaign_pk=object.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">
+            <span aria-hidden="true">♙</span> Party <span class="campaign-action-count">{{ characters|length }}</span>
+          </a>
+          {% if is_campaign_owner %}
+            <a class="btn btn-outline-secondary" href="{% url 'campaigns:campaign-update' object.pk %}">Edit campaign</a>
+            <a class="btn btn-outline-danger" href="{% url 'campaigns:campaign-delete' object.pk %}">Delete</a>
+          {% elif user.is_authenticated %}
+            {% if user_character %}
+              <a class="btn btn-outline-danger" href="{% url 'campaigns:characters:character-delete' campaign_pk=object.pk pk=user_character.pk %}">Leave campaign</a>
+            {% elif object.is_active == "ended" %}
+              <span class="btn btn-outline-secondary disabled" aria-disabled="true">Campaign ended</span>
+            {% else %}
+              <a class="btn btn-primary" href="{% url 'campaigns:characters:character-create' campaign_pk=object.pk %}">Join this campaign</a>
+            {% endif %}
+          {% else %}
+            {% if object.is_active == "ended" %}
+              <span class="btn btn-outline-secondary disabled" aria-disabled="true">Campaign ended</span>
+            {% else %}
+              <a class="btn btn-primary" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Log in to join</a>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <nav id="campaign-detail-tabs" class="campaign-detail-tabs mt-4" aria-label="Campaign sections" role="tablist">
+      <a id="campaign-tab-overview" class="{% if active_tab == 'overview' %}is-active{% endif %}" role="tab" aria-controls="campaign-tab-panel" aria-selected="{% if active_tab == 'overview' %}true{% else %}false{% endif %}" tabindex="{% if active_tab == 'overview' %}0{% else %}-1{% endif %}" href="?tab=overview{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}#campaign-tab-panel" hx-get="?tab=overview{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}" hx-target="#campaign-tab-panel" hx-swap="innerHTML" hx-push-url="true">Overview</a>
+      <a id="campaign-tab-participants" class="{% if active_tab == 'participants' %}is-active{% endif %}" role="tab" aria-controls="campaign-tab-panel" aria-selected="{% if active_tab == 'participants' %}true{% else %}false{% endif %}" tabindex="{% if active_tab == 'participants' %}0{% else %}-1{% endif %}" href="?tab=participants{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}#campaign-tab-panel" hx-get="?tab=participants{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}" hx-target="#campaign-tab-panel" hx-swap="innerHTML" hx-push-url="true">Participants <span>{{ characters|length }}</span></a>
+      {% if is_campaign_owner %}
+        <a id="campaign-tab-inventory" class="{% if active_tab == 'inventory' %}is-active{% endif %}" role="tab" aria-controls="campaign-tab-panel" aria-selected="{% if active_tab == 'inventory' %}true{% else %}false{% endif %}" tabindex="{% if active_tab == 'inventory' %}0{% else %}-1{% endif %}" href="?tab=inventory{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}#campaign-tab-panel" hx-get="?tab=inventory{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}" hx-target="#campaign-tab-panel" hx-swap="innerHTML" hx-push-url="true">Inventory <span>{{ campaign_items|length }}</span></a>
+        <a id="campaign-tab-quests" class="{% if active_tab == 'quests' %}is-active{% endif %}" role="tab" aria-controls="campaign-tab-panel" aria-selected="{% if active_tab == 'quests' %}true{% else %}false{% endif %}" tabindex="{% if active_tab == 'quests' %}0{% else %}-1{% endif %}" href="?tab=quests{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}#campaign-tab-panel" hx-get="?tab=quests{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}" hx-target="#campaign-tab-panel" hx-swap="innerHTML" hx-push-url="true">Quests <span>{{ campaign_quests|length }}</span></a>
+        <a id="campaign-tab-monsters" class="{% if active_tab == 'monsters' %}is-active{% endif %}" role="tab" aria-controls="campaign-tab-panel" aria-selected="{% if active_tab == 'monsters' %}true{% else %}false{% endif %}" tabindex="{% if active_tab == 'monsters' %}0{% else %}-1{% endif %}" href="?tab=monsters{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}#campaign-tab-panel" hx-get="?tab=monsters{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}" hx-target="#campaign-tab-panel" hx-swap="innerHTML" hx-push-url="true">Monsters <span>{{ campaign_monsters|length }}</span></a>
+        <a id="campaign-tab-notes" class="{% if active_tab == 'notes' %}is-active{% endif %}" role="tab" aria-controls="campaign-tab-panel" aria-selected="{% if active_tab == 'notes' %}true{% else %}false{% endif %}" tabindex="{% if active_tab == 'notes' %}0{% else %}-1{% endif %}" href="?tab=notes{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}#campaign-tab-panel" hx-get="?tab=notes{% if return_profile_user %}&amp;from_profile={{ return_profile_user.pk }}{% endif %}" hx-target="#campaign-tab-panel" hx-swap="innerHTML" hx-push-url="true">Notes <span>{{ campaign_notes|length }}</span></a>
+      {% endif %}
+    </nav>
+
+    <div id="campaign-tab-panel" class="campaign-tab-panel" role="tabpanel" aria-labelledby="campaign-tab-{{ active_tab }}" tabindex="0">
+      {% include tab_template %}
+    </div>
+  </main>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/campaign-detail-tabs.js' %}" defer></script>
+{% endblock %}

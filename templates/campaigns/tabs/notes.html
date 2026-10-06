@@ -1,0 +1,39 @@
+{% if is_campaign_owner %}
+  <section id="campaign-notes" class="campaign-detail-section campaign-notes-section">
+    <div class="campaign-section-heading">
+      <div><p class="campaign-section-eyebrow">Private campaign notes</p><h2>Campaign notes</h2></div>
+      <span class="campaign-section-count">{{ campaign_notes|length }}</span>
+    </div>
+    <div class="campaign-notes-layout">
+      <div class="campaign-note-compose">
+        <h3>New note</h3>
+        <form method="post" action="{% url 'campaigns:campaign-note-create' campaign_pk=object.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}#campaign-notes">
+          {% csrf_token %}
+          {% if campaign_note_form.content.errors %}<div class="alert alert-danger">{{ campaign_note_form.content.errors }}</div>{% endif %}
+          {{ campaign_note_form.content }}
+          <button class="btn btn-primary mt-3" type="submit">Add note</button>
+        </form>
+      </div>
+      <div class="campaign-note-list">
+        <h3>Campaign notes <span>{{ campaign_notes|length }}</span></h3>
+        {% for note in campaign_notes %}
+          <article class="campaign-note-card">
+            <div class="campaign-note-card-header">
+              <span class="campaign-detail-avatar" aria-hidden="true">{{ note.user.username|first|upper }}</span>
+              <span class="campaign-note-author"><strong>{{ note.user.get_full_name|default:note.user.username }}</strong><small>{{ note.created_at|date:"M j, Y · H:i" }}</small></span>
+              {% if note.user_id == user.pk or is_campaign_owner %}
+                <span class="campaign-note-actions">
+                  <a class="campaign-note-action" aria-label="Edit note" title="Edit note" href="{% url 'campaigns:campaign-note-update' campaign_pk=object.pk pk=note.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">✎</a>
+                  <a class="campaign-note-action is-danger" aria-label="Delete note" title="Delete note" href="{% url 'campaigns:campaign-note-delete' campaign_pk=object.pk pk=note.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">⌫</a>
+                </span>
+              {% endif %}
+            </div>
+            <div class="campaign-note-content">{{ note.content|linebreaksbr }}</div>
+          </article>
+        {% empty %}
+          <div class="campaign-detail-empty">No notes yet. Add a clue, decision, or moment worth remembering.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+{% endif %}

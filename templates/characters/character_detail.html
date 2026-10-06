@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="card-title">{{ object.name }}</h2>
+                <span class="badge
+                    {% if object.gender == 'M' %}
+                        bg-primary
+                    {% elif object.gender == 'F' %}
+                        bg-danger
+                    {% else %}
+                        bg-secondary
+                    {% endif %}">
+                    {{ object.get_gender_display }}
+                </span>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>
+                        <strong>Level:</strong>
+                        {{ object.level }}
+                    </p>
+                    <p>
+                        <strong>Experience:</strong>
+                        {{ object.experience }}
+                    </p>
+                    <p>
+                        <strong>Race:</strong>
+                        {{ object.race.name }}
+                    </p>
+                    <p>
+                        <strong>Class:</strong>
+                        {{ object.character_class.name }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p>
+                        <strong>Campaign:</strong>
+                        <a href="{% url 'campaigns:campaign-detail' object.campaign.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">
+                            {{ object.campaign.title }}
+                        </a>
+                    </p>
+                    <p>
+                        <strong>Player:</strong>
+                        <a href="{% url 'accounts:user-detail' object.player.pk %}">
+                            {{ object.player.username }}
+                        </a>
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <h5>Race</h5>
+            <p>
+                <strong>{{ object.race.name }}</strong>
+            </p>
+            <p>
+                {{ object.race.race_traits_description }}
+            </p>
+            <p>
+                <strong>Ability:</strong>
+                {{ object.race.ability }}
+            </p>
+            <hr>
+            <h5>Class</h5>
+            <p>
+                <strong>{{ object.character_class.name }}</strong>
+            </p>
+            <p>
+                {{ object.character_class.class_traits_description }}
+            </p>
+            <p>
+                <strong>Ability:</strong>
+                {{ object.character_class.ability }}
+            </p>
+            <hr>
+            <h5>Bio</h5>
+            {% if object.bio %}
+                <p>{{ object.bio }}</p>
+            {% else %}
+                <p class="text-muted">No biography provided.</p>
+            {% endif %}
+            <hr>
+            {% if return_profile_user %}
+                <a href="{% url 'accounts:user-detail' pk=return_profile_user.pk %}" class="btn btn-secondary">Back to profile</a>
+            {% else %}
+                <a href="{% url 'campaigns:characters:character-list' campaign_pk=object.campaign.pk %}" class="btn btn-secondary">Back to characters</a>
+            {% endif %}
+            {% if user == object.player %}
+                <a href="{% url 'campaigns:characters:character-update' pk=object.pk campaign_pk=object.campaign.pk %}"
+                   class="btn btn-primary">
+                    Edit character
+                </a>
+                <a href="{% url 'campaigns:characters:character-delete' pk=object.pk campaign_pk=object.campaign.pk %}"
+                   class="btn btn-danger">
+                    Delete character
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

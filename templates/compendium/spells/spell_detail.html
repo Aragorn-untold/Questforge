@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}<title>{{ object.name }} | Spells | QuestForge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5">
+    <a href="{% url 'compendium:spells:spell-list' %}" class="text-muted small">← Back to spells</a>
+    <article class="card border-0 shadow-sm mt-3">
+      <div class="card-body p-4 p-lg-5">
+        <p class="text-uppercase text-muted small font-weight-bold mb-2">{{ object.get_level_display }} · {{ object.get_school_display }}</p>
+        <h1 class="display-4 mb-3">{{ object.name }}</h1>
+        <p class="text-muted" style="line-height: 1.75">{{ object.description|linebreaksbr }}</p>
+
+        <dl class="row mt-4">
+          <dt class="col-sm-4">Casting time</dt><dd class="col-sm-8">{{ object.cast_time }}{% if object.cast_as_ritual %} (ritual){% endif %}</dd>
+          <dt class="col-sm-4">Range</dt><dd class="col-sm-8">{{ object.spell_range }}</dd>
+          <dt class="col-sm-4">Duration</dt><dd class="col-sm-8">{{ object.spell_duration }}{% if object.concentration_required %} (concentration){% endif %}</dd>
+          <dt class="col-sm-4">Classes</dt><dd class="col-sm-8">{% for character_class in object.allowed_classes.all %}{% if not forloop.first %}, {% endif %}{{ character_class.name }}{% empty %}No classes listed{% endfor %}</dd>
+          {% if object.saving_throw %}<dt class="col-sm-4">Saving throw</dt><dd class="col-sm-8">{{ object.get_saving_throw_display }}</dd>{% endif %}
+          {% if object.damage %}<dt class="col-sm-4">Damage</dt><dd class="col-sm-8">{{ object.damage }}</dd>{% endif %}
+        </dl>
+      </div>
+    </article>
+  </main>
+{% endblock %}

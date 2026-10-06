@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from items.forms import CampaignItemForm, ItemSearchForm
+from compendium.items.forms import CampaignItemForm, ItemSearchForm
 
 
 class ItemFormConfigurationTests(SimpleTestCase):

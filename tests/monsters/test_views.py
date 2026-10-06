@@ -9,7 +9,7 @@ class MonsterListViewTests(TestCase):
         match = create_monster("Cave Stalker")
         create_monster("Marsh Drake")
 
-        response = self.client.get(reverse("monsters:monster-list"), {"name": "  cave  "})
+        response = self.client.get(reverse("compendium:monsters:monster-list"), {"name": "  cave  "})
 
         self.assertEqual(list(response.context["monster_list"]), [match])
 

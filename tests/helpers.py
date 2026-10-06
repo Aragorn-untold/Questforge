@@ -6,9 +6,9 @@ from django.contrib.auth import get_user_model
 from accounts.models import Profile
 from campaigns.models import Campaign
 from characters.models import Character, CharacterClass, Race
-from items.models import CampaignItem, Item
-from monsters.models import CampaignMonster, Monster
-from quests.models import CampaignQuest, Quest
+from compendium.items.models import CampaignItem, Item
+from compendium.monsters.models import CampaignMonster, Monster
+from compendium.quests.models import CampaignQuest, Quest
 
 _campaign_creator_ids = count()
 

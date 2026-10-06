@@ -6,9 +6,10 @@ The deployed application is available at <https://questforge-l9d4.onrender.com/>
 
 ## Features
 
-- Browse and search campaigns, reusable items, quests, and monsters.
+- Browse campaigns and the Compendium's reusable items, quests, monsters, and spells.
 - Create campaigns and manage them as the game master.
 - Add campaign-specific items, quests, and monsters from reusable catalogs.
+- Look up spell rules and class availability in the Compendium.
 - Keep campaign notes visible only to the game master.
 - Join a campaign with one character per player; ended campaigns cannot be joined.
 - View profiles, campaigns, and characters associated with a user.
@@ -80,9 +81,11 @@ These credentials are for local development and testing only. Do not load this f
 | `/accounts/` | Registration, login, profiles, and account pages |
 | `/campaigns/` | Campaign list, search, creation, and details |
 | `/tavern/` | Community message feed |
-| `/items/` | Reusable item catalog |
-| `/quests/` | Reusable quest catalog |
-| `/monsters/` | Reusable monster catalog |
+| `/compendium/` | Compendium index |
+| `/compendium/items/` | Reusable item catalog |
+| `/compendium/quests/` | Reusable quest catalog |
+| `/compendium/monsters/` | Reusable monster catalog |
+| `/compendium/spells/` | Spell reference |
 | `/hello-there/admin/` | Django administration site |
 
 Campaign-specific characters and content are managed from campaign pages. Only the game master can update or delete a campaign or manage its campaign-specific content and notes. Players must sign in to join a campaign.

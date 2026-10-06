@@ -33,8 +33,8 @@ class CampaignNoteMembershipMixin(LoginRequiredMixin, UserPassesTestMixin):
         return context
 
     def get_success_url(self):
-        url = f"{self.campaign.get_absolute_url()}#campaign-notes"
+        query = "tab=notes"
         profile_pk = self.request.GET.get("from_profile")
         if profile_pk and profile_pk.isdigit():
-            url = f"{self.campaign.get_absolute_url()}?from_profile={profile_pk}#campaign-notes"
-        return url
+            query += f"&from_profile={profile_pk}"
+        return f"{self.campaign.get_absolute_url()}?{query}#campaign-notes"

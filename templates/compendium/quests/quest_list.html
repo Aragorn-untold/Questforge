@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Quests | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 quest-page">
+    <div class="quest-hero p-4 p-lg-5 mb-4">
+      <span class="quest-eyebrow">Adventure library</span>
+      <h1 class="display-4 mt-2 mb-2">Quests</h1>
+      <p class="mb-0">Find a challenge, a new story, and a reward worth the journey.</p>
+    </div>
+
+    <div id="quest-search-content">
+    <div class="campaign-search-form mb-4">
+      <div class="form-group mb-0">
+        <label class="sr-only" for="id_title">Search quests by title</label>
+        <input class="form-control" type="search" name="title" id="id_title" maxlength="255" placeholder="Search by title" value="{{ quest_search_form.title.value|default_if_none:'' }}" hx-get="{% url 'compendium:quests:quest-list' %}" hx-trigger="input changed delay:500ms, keyup[key=='Enter']" hx-target="#quest-search-content" hx-select="#quest-search-content" hx-swap="outerHTML" hx-replace-url="true" hx-preserve>
+      </div>
+      {% if clear %}
+        <a class="btn btn-outline-secondary" href="{% url 'compendium:quests:quest-list' %}">Clear</a>
+      {% endif %}
+    </div>
+
+    {% if quest_list %}
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">Available adventures</h2>
+        {% if is_paginated %}<span class="badge badge-light px-3 py-2">{{ paginator.count }} quests</span>{% endif %}
+      </div>
+      <div class="row">
+        {% for quest in quest_list %}
+          <div class="col-md-6 col-xl-4 mb-4">
+            <article class="card quest-card h-100 border-0 shadow-sm">
+              <div class="card-body d-flex flex-column p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="quest-icon" aria-hidden="true">⚔</span>
+                  {% if quest.difficulty_rating == 'EASY' %}
+                    <span class="badge badge-success">{{ quest.get_difficulty_rating_display }}</span>
+                  {% elif quest.difficulty_rating == 'MEDIUM' %}
+                    <span class="badge badge-info">{{ quest.get_difficulty_rating_display }}</span>
+                  {% elif quest.difficulty_rating == 'HARD' %}
+                    <span class="badge badge-warning">{{ quest.get_difficulty_rating_display }}</span>
+                  {% else %}
+                    <span class="badge badge-danger">{{ quest.get_difficulty_rating_display }}</span>
+                  {% endif %}
+                </div>
+                <h2 class="h4"><a class="text-dark stretched-link" href="{% url 'compendium:quests:quest-detail' pk=quest.pk %}">{{ quest.title }}</a></h2>
+                <p class="text-muted flex-grow-1">{{ quest.description|truncatechars:150 }}</p>
+                <div class="quest-card-meta border-top pt-3 mt-2 small">
+                  <span class="text-muted">Recommended level</span>
+                  <strong>{{ quest.level_recommendation }}</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm text-center py-5 px-3">
+        <div class="card-body">
+          <div class="quest-icon quest-empty-icon mb-3" aria-hidden="true">⚔</div>
+          {% if clear %}
+            <h2 class="h3">No quests found</h2>
+            <p class="text-muted mb-0">No quest titles match “{{ clear }}”. Try another search.</p>
+          {% else %}
+            <h2 class="h3">No quests yet</h2>
+            <p class="text-muted mb-0">New adventures will appear here when they’re added to the library.</p>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+    {% include "includes/pagination.html" %}
+    </div>
+  </main>
+{% endblock %}
+
+{% block pagination %}{% endblock %}

@@ -31,9 +31,10 @@ INSTALLED_APPS = [
     "accounts",
     "campaigns",
     "characters",
-    "items",
-    "quests",
-    "monsters",
+    "compendium.items.apps.ItemsConfig",
+    "compendium.quests.apps.QuestsConfig",
+    "compendium.monsters.apps.MonstersConfig",
+    "compendium.spells.apps.SpellsConfig",
     "chats"
 ]
 

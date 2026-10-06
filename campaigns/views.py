@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Prefetch
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
@@ -9,12 +10,12 @@ from campaigns.mixin import CampaignOwnerMixin
 from campaigns.models import Campaign, CampaignNote
 from characters.models import Character
 from campaigns.forms import CampaignNoteForm, CampaignUpdateForm, CampaignSearchForm
-from items.forms import CampaignItemForm
-from items.models import CampaignItem, Item
-from monsters.forms import CampaignMonsterForm
-from monsters.models import CampaignMonster, Monster
-from quests.forms import CampaignQuestForm
-from quests.models import CampaignQuest, Quest
+from compendium.items.forms import CampaignItemForm
+from compendium.items.models import CampaignItem, Item
+from compendium.monsters.forms import CampaignMonsterForm
+from compendium.monsters.models import CampaignMonster, Monster
+from compendium.quests.forms import CampaignQuestForm
+from compendium.quests.models import CampaignQuest, Quest
 
 User = get_user_model()
 
@@ -38,6 +39,7 @@ class CampaignListView(generic.ListView):
 
 class CampaignDetailView(generic.DetailView):
     model = Campaign
+    template_name = "campaigns/campaign_detail.html"
     queryset = Campaign.objects.select_related("creator").prefetch_related(
         Prefetch(
             "characters",
@@ -47,11 +49,35 @@ class CampaignDetailView(generic.DetailView):
         )
     )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        is_campaign_owner = self.request.user.is_authenticated and (
+    def is_campaign_owner(self):
+        return self.request.user.is_authenticated and (
             self.object.creator_id == self.request.user.pk
         )
+
+    def available_tabs(self):
+        tabs = {"overview", "participants"}
+        if self.is_campaign_owner():
+            tabs.update({"inventory", "quests", "monsters", "notes"})
+        return tabs
+
+    def get_active_tab(self):
+        requested_tab = self.request.GET.get("tab", "overview")
+        if requested_tab in self.available_tabs():
+            return requested_tab
+        if self.request.headers.get("HX-Request") == "true":
+            raise Http404
+        return "overview"
+
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request") == "true":
+            return [f"campaigns/tabs/{self.get_active_tab()}.html"]
+        return [self.template_name]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        is_campaign_owner = self.is_campaign_owner()
+        context["active_tab"] = self.get_active_tab()
+        context["tab_template"] = f"campaigns/tabs/{context['active_tab']}.html"
         profile_pk = self.request.GET.get("from_profile")
         context["return_profile_user"] = (
             User.objects.filter(pk=profile_pk).first()
@@ -111,6 +137,7 @@ class CampaignDeleteView(CampaignOwnerMixin, generic.DeleteView):
 class CampaignItemCreationView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = CampaignItem
     form_class = CampaignItemForm
+    template_name = "compendium/items/campaignitem_form.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.campaign = get_object_or_404(Campaign, pk=kwargs["campaign_pk"])
@@ -150,6 +177,7 @@ class CampaignItemCreationView(LoginRequiredMixin, UserPassesTestMixin, generic.
 class CampaignQuestCreationView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = CampaignQuest
     form_class = CampaignQuestForm
+    template_name = "compendium/quests/campaignquest_form.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.campaign = get_object_or_404(Campaign, pk=kwargs["campaign_pk"])
@@ -189,6 +217,7 @@ class CampaignQuestCreationView(LoginRequiredMixin, UserPassesTestMixin, generic
 class CampaignMonsterCreationView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = CampaignMonster
     form_class = CampaignMonsterForm
+    template_name = "compendium/monsters/campaignmonster_form.html"
 
     def dispatch(self, request, *args, **kwargs):
         self.campaign = get_object_or_404(Campaign, pk=kwargs["campaign_pk"])

@@ -1,6 +1,6 @@
 # QuestForge project overview
 
-QuestForge is a deployed Django application for managing tabletop fantasy campaigns. The live site is [questforge-l9d4.onrender.com](https://questforge-l9d4.onrender.com/). It includes accounts and profiles, campaigns and characters, reusable catalogs for items, quests, and monsters, private game-master campaign notes, and a site-wide chat called the Tavern. The home page shows the current campaign and user counts.
+QuestForge is a deployed Django application for managing tabletop fantasy campaigns. The live site is [questforge-l9d4.onrender.com](https://questforge-l9d4.onrender.com/). It includes accounts and profiles, campaigns and characters, a Compendium of reusable items, quests, monsters, and spells, private game-master campaign notes, and a site-wide chat called the Tavern. The home page shows the current campaign and user counts.
 
 ## Application structure
 
@@ -10,9 +10,11 @@ flowchart LR
     Routes --> Accounts[accounts app]
     Routes --> Campaigns[campaigns app]
     Routes --> Characters[characters app]
-    Routes --> Items[items app]
-    Routes --> Quests[quests app]
-    Routes --> Monsters[monsters app]
+    Routes --> Compendium[compendium URL group]
+    Compendium --> Items[items app]
+    Compendium --> Quests[quests app]
+    Compendium --> Monsters[monsters app]
+    Compendium --> Spells[spells app]
     Routes --> Chats[chats app]
 
     Accounts --> Views[Views and app services]
@@ -21,6 +23,7 @@ flowchart LR
     Items --> Views
     Quests --> Views
     Monsters --> Views
+    Spells --> Views
     Chats --> Views
 
     Views --> Models[Models and relationships]
@@ -118,9 +121,11 @@ The fixture contains development accounts `admin` / `ghblehrb12` (administrator)
 | `/accounts/` | Registration, authentication, profiles, and account pages |
 | `/campaigns/` | Campaign list, search, details, characters, and campaign-specific content |
 | `/tavern/` | Public community message feed |
-| `/items/` | Reusable item catalog |
-| `/quests/` | Reusable quest catalog |
-| `/monsters/` | Reusable monster catalog |
+| `/compendium/` | Compendium index |
+| `/compendium/items/` | Reusable item catalog |
+| `/compendium/quests/` | Reusable quest catalog |
+| `/compendium/monsters/` | Reusable monster catalog |
+| `/compendium/spells/` | Spell reference |
 | `/hello-there/admin/` | Django administration site |
 
 The site stylesheet is `static/css/styles.css`. Project JavaScript is kept in `static/js/` and loaded by templates that use it.

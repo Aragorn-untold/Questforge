@@ -9,7 +9,7 @@ class ItemListViewTests(TestCase):
         match = create_item("Silvered Dagger")
         create_item("Oak Shield")
 
-        response = self.client.get(reverse("items:item-list"), {"name": "SILVER"})
+        response = self.client.get(reverse("compendium:items:item-list"), {"name": "SILVER"})
 
         self.assertEqual(list(response.context["item_list"]), [match])
 

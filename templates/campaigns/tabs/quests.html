@@ -1,0 +1,20 @@
+<section id="campaign-quests" class="campaign-detail-section">
+  <div class="campaign-section-heading">
+    <div><p class="campaign-section-eyebrow">Stories in this world</p><h2>Quests</h2></div>
+    <span class="campaign-section-count">{{ campaign_quests|length }}</span>
+  </div>
+  {% if campaign_quests %}
+    <div class="campaign-resource-grid">
+      {% for quest in campaign_quests %}
+        <article class="campaign-detail-card campaign-resource-card">
+          <div class="campaign-resource-heading"><h3>{{ quest.title }}</h3><span>{{ quest.get_difficulty_rating_display }}</span></div>
+          <p>{{ quest.description|truncatechars:180 }}</p>
+          <small>Recommended level: {{ quest.level_recommendation }}</small>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="campaign-detail-empty">This campaign has no quests yet.</div>
+  {% endif %}
+  <a class="btn btn-outline-secondary mt-3" href="{% url 'campaigns:campaign-quest-list' campaign_pk=object.pk %}">Manage campaign quests</a>
+</section>

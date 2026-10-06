@@ -9,7 +9,7 @@ class QuestListViewTests(TestCase):
         match = create_quest("The Lost Crown")
         create_quest("A Quiet Crossing")
 
-        response = self.client.get(reverse("quests:quest-list"), {"title": "lost"})
+        response = self.client.get(reverse("compendium:quests:quest-list"), {"title": "lost"})
 
         self.assertEqual(list(response.context["quest_list"]), [match])
 

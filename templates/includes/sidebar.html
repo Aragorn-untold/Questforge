@@ -9,9 +9,7 @@
       <a class="site-nav-link{% if request.resolver_match.url_name == 'home' %} is-active{% endif %}" href="{% url 'home' %}">Home</a>
       <a class="site-nav-link{% if request.resolver_match.app_name == 'campaigns' %} is-active{% endif %}" href="{% url 'campaigns:campaign-list' %}">Campaigns</a>
       <a class="site-nav-link{% if request.resolver_match.app_name == 'chats' %} is-active{% endif %}" href="{% url 'chats:chats-message-list' %}">Tavern</a>
-      <a class="site-nav-link{% if request.resolver_match.app_name == 'items' %} is-active{% endif %}" href="{% url 'items:item-list' %}">Items</a>
-      <a class="site-nav-link{% if request.resolver_match.app_name == 'quests' %} is-active{% endif %}" href="{% url 'quests:quest-list' %}">Quests</a>
-      <a class="site-nav-link{% if request.resolver_match.app_name == 'monsters' %} is-active{% endif %}" href="{% url 'monsters:monster-list' %}">Monsters</a>
+      <a class="site-nav-link{% if request.resolver_match.namespace == 'compendium' or request.resolver_match.namespace == 'compendium:items' or request.resolver_match.namespace == 'compendium:quests' or request.resolver_match.namespace == 'compendium:monsters' or request.resolver_match.namespace == 'compendium:spells' %} is-active{% endif %}" href="{% url 'compendium:compendium-page' %}">Compendium</a>
       {% if request.user.is_staff %}
         <a class="site-nav-link{% if request.resolver_match.app_name == 'accounts' %} is-active{% endif %}" href="{% url 'accounts:user-list' %}">Users</a>
       {% endif %}

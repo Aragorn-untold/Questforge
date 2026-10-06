@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from quests.forms import CampaignQuestForm, QuestSearchForm
+from compendium.quests.forms import CampaignQuestForm, QuestSearchForm
 
 
 class QuestFormConfigurationTests(SimpleTestCase):

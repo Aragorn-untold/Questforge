@@ -9,8 +9,6 @@ urlpatterns = [
     path("hello-there/admin/", admin.site.urls),
     path("accounts/", include("accounts.urls", namespace="accounts")),
     path("campaigns/", include("campaigns.urls", namespace="campaigns")),
-    path("items/", include("items.urls", namespace="items")),
-    path("quests/", include("quests.urls", namespace="quests")),
-    path("monsters/", include("monsters.urls", namespace="monsters")),
+    path("compendium/", include("compendium.urls", namespace="compendium")),
     path("tavern/", include("chats.urls", namespace="chats"))
 ]

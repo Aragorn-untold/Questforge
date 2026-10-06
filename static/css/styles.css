@@ -1506,8 +1506,8 @@ body.site-body {
 .home-hero-mark {
   position: absolute;
   top: 50%;
-  right: 2.5%;
-  width: clamp(19.845rem, 36.855vw, 29.7675rem);
+  right: 0.5%;
+  width: clamp(23.814rem, 44.226vw, 35.721rem);
   height: auto;
   opacity: 0.82;
   filter: drop-shadow(0 0 0.45rem rgba(214, 177, 95, 0.22)) drop-shadow(0 0 1.2rem rgba(194, 151, 62, 0.12));
@@ -1558,10 +1558,28 @@ body.site-body {
 }
 
 .home-feature-card {
+  display: flex;
+  flex-direction: column;
   padding: 1.6rem;
   background: rgba(16, 19, 24, 0.94);
   border: 1px solid var(--line);
   border-radius: 0.9rem;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+}
+
+.home-feature-card:hover,
+.home-feature-card:focus-visible {
+  color: inherit;
+  text-decoration: none;
+  border-color: rgba(214, 177, 95, 0.58);
+  box-shadow: 0 0 1.2rem rgba(214, 177, 95, 0.2), 0 0 0 1px rgba(214, 177, 95, 0.12);
+}
+
+.home-feature-card:focus-visible {
+  outline: 2px solid rgba(214, 177, 95, 0.7);
+  outline-offset: 3px;
 }
 
 .home-feature-icon {
@@ -1586,26 +1604,20 @@ body.site-body {
 }
 
 .home-feature-card p {
-  min-height: 4.5rem;
   margin-bottom: 1.15rem;
   color: var(--muted);
   line-height: 1.65;
 }
 
-.home-feature-card a {
+.home-feature-link {
+  margin-top: auto;
   color: var(--gold-bright);
   font-weight: 700;
 }
 
-.home-feature-card a:hover {
+.home-feature-card:hover .home-feature-link,
+.home-feature-card:focus-visible .home-feature-link {
   color: #ffe19a;
-  text-decoration: none;
-}
-
-.home-feature-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
 }
 
 .home-callout {
@@ -1904,9 +1916,9 @@ body.site-body .item-card:hover { box-shadow: 0 12px 34px rgba(0,0,0,.22) !impor
 
   .home-hero-mark {
     top: auto;
-    right: -3rem;
+    right: -2rem;
     bottom: -2rem;
-    width: 19.845rem;
+    width: 23.814rem;
     opacity: 0.28;
     transform: none;
   }

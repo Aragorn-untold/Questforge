@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from campaigns.models import Campaign
-from items.models import CampaignItem
+from compendium.items.models import CampaignItem
 
 
 class Character(models.Model):

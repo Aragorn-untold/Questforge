@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from monsters.forms import CampaignMonsterForm, MonsterSearchForm
+from compendium.monsters.forms import CampaignMonsterForm, MonsterSearchForm
 
 
 class MonsterFormConfigurationTests(SimpleTestCase):

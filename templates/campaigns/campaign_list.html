@@ -17,16 +17,16 @@
       {% endif %}
     </div>
 
-    <form method="get" action="" class="campaign-search-form mb-4">
+    <div id="campaign-search-content">
+    <div class="campaign-search-form mb-4">
       <div class="form-group mb-0">
         <label class="sr-only" for="id_title">Search campaigns by title</label>
-        {{ campaign_search_form.title }}
+        <input class="form-control" type="search" name="title" id="id_title" maxlength="255" placeholder="Search by title" value="{{ campaign_search_form.title.value|default_if_none:'' }}" hx-get="{% url 'campaigns:campaign-list' %}" hx-trigger="input changed delay:500ms, keyup[key=='Enter']" hx-target="#campaign-search-content" hx-select="#campaign-search-content" hx-swap="outerHTML" hx-replace-url="true" hx-preserve>
       </div>
-      <button class="btn btn-primary" type="submit">Search</button>
       {% if clear %}
         <a class="btn btn-outline-secondary" href="{% url 'campaigns:campaign-list' %}">Clear</a>
       {% endif %}
-    </form>
+    </div>
 
     {% if campaign_list %}
       <div class="d-flex justify-content-between align-items-center mb-3">
@@ -75,9 +75,9 @@
       <div class="card border-0 shadow-sm text-center py-5 px-3">
         <div class="card-body">
           <div class="campaign-empty-mark mb-3" aria-hidden="true">✦</div>
-          {% if search_query %}
+          {% if clear %}
             <h2 class="h3">No campaigns found</h2>
-            <p class="text-muted mx-auto mb-0" style="max-width: 32rem;">No campaign titles match “{{ search_query }}”. Try another search.</p>
+            <p class="text-muted mx-auto mb-0" style="max-width: 32rem;">No campaign titles match “{{ clear }}”. Try another search.</p>
           {% else %}
             <h2 class="h3">Your next adventure awaits</h2>
             <p class="text-muted mx-auto mb-4" style="max-width: 32rem;">
@@ -90,5 +90,9 @@
         </div>
       </div>
     {% endif %}
+    {% include "includes/pagination.html" %}
+    </div>
   </main>
 {% endblock %}
+
+{% block pagination %}{% endblock %}

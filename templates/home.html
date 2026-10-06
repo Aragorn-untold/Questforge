@@ -49,40 +49,29 @@
         <p class="text-muted mb-0">Keep campaign details and useful references together, ready for the next session.</p>
       </div>
       <div class="row">
-        <div class="col-md-6 col-xl-3 mb-4">
-          <article class="home-feature-card h-100">
+        <div class="col-md-6 col-xl-4 mb-4">
+          <a class="home-feature-card h-100" href="{% url 'campaigns:campaign-list' %}">
             <span class="home-feature-icon" aria-hidden="true">⌘</span>
             <h3>Campaigns and parties</h3>
             <p>Browse campaign worlds, see who is running them, and join a game by creating your character for that campaign.</p>
-            <a href="{% url 'campaigns:campaign-list' %}">Browse campaigns <span aria-hidden="true">→</span></a>
-          </article>
+            <span class="home-feature-link">Browse campaigns <span aria-hidden="true">→</span></span>
+          </a>
         </div>
-        <div class="col-md-6 col-xl-3 mb-4">
-          <article class="home-feature-card h-100">
-            <span class="home-feature-icon" aria-hidden="true">⚔</span>
-            <h3>Items and equipment</h3>
-            <p>Explore the item collection and keep campaign-specific equipment available to the game master.</p>
-            <a href="{% url 'items:item-list' %}">Explore items <span aria-hidden="true">→</span></a>
-          </article>
-        </div>
-        <div class="col-md-6 col-xl-3 mb-4">
-          <article class="home-feature-card h-100">
+        <div class="col-md-6 col-xl-4 mb-4">
+          <a class="home-feature-card h-100" href="{% url 'compendium:compendium-page' %}">
             <span class="home-feature-icon" aria-hidden="true">✧</span>
-            <h3>Quests and monsters</h3>
-            <p>Keep story hooks and foes at hand, then add the ones you need to a campaign.</p>
-            <div class="home-feature-links">
-              <a href="{% url 'quests:quest-list' %}">Browse quests <span aria-hidden="true">→</span></a>
-              <a href="{% url 'monsters:monster-list' %}">Browse monsters <span aria-hidden="true">→</span></a>
-            </div>
-          </article>
+            <h3>Compendium</h3>
+            <p>Explore items, quests, monsters, and spells to find useful additions for your campaign.</p>
+            <span class="home-feature-link">Explore the Compendium <span aria-hidden="true">→</span></span>
+          </a>
         </div>
-        <div class="col-md-6 col-xl-3 mb-4">
-          <article class="home-feature-card h-100">
+        <div class="col-md-6 col-xl-4 mb-4">
+          <a class="home-feature-card h-100" href="{% url 'chats:chats-message-list' %}">
             <span class="home-feature-icon" aria-hidden="true">♨</span>
             <h3>The Tavern</h3>
             <p>Drop into the community chat to catch up and share a talk. Hot topics and hot meals await you.</p>
-            <a href="{% url 'chats:chats-message-list' %}">Visit the Tavern <span aria-hidden="true">→</span></a>
-          </article>
+            <span class="home-feature-link">Visit the Tavern <span aria-hidden="true">→</span></span>
+          </a>
         </div>
       </div>
     </section>

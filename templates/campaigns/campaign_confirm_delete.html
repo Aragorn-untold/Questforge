@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Delete campaign | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-5 confirm-page">
+    <section class="card border-0 shadow-sm mx-auto">
+      <div class="card-body p-4 p-lg-5">
+        <span class="directory-eyebrow">Campaign management</span>
+        <h1 class="h2 mt-2">Delete campaign?</h1>
+        <p class="text-muted">Are you sure you want to delete <strong class="text-light">{{ object.title }}</strong>? This also removes its campaign characters and campaign-specific content.</p>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Yes, delete campaign</button>
+          <a href="{{ object.get_absolute_url }}" class="btn btn-outline-secondary ml-2">Cancel</a>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

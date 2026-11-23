@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Items | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 item-page">
+    <div class="item-hero p-4 p-lg-5 mb-4">
+      <span class="item-eyebrow">Equipment and treasures</span>
+      <h1 class="display-4 mt-2 mb-2">Items</h1>
+      <p class="mb-0">Discover useful gear, rare relics, and magical treasures for your next adventure.</p>
+    </div>
+
+    <div id="item-search-content">
+    <div class="campaign-search-form mb-4">
+      <div class="form-group mb-0">
+        <label class="sr-only" for="id_name">Search items by name</label>
+        <input class="form-control" type="search" name="name" id="id_name" maxlength="255" placeholder="Search by name" value="{{ item_search_form.name.value|default_if_none:'' }}" hx-get="{% url 'compendium:items:item-list' %}" hx-trigger="input changed delay:500ms, keyup[key=='Enter']" hx-target="#item-search-content" hx-select="#item-search-content" hx-swap="outerHTML" hx-replace-url="true" hx-preserve>
+      </div>
+      {% if clear %}
+        <a class="btn btn-outline-secondary" href="{% url 'compendium:items:item-list' %}">Clear</a>
+      {% endif %}
+    </div>
+
+    {% if item_list %}
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">The collection</h2>
+        {% if is_paginated %}<span class="badge badge-light px-3 py-2">{{ paginator.count }} items</span>{% endif %}
+      </div>
+      <div class="row">
+        {% for item in item_list %}
+          <div class="col-md-6 col-xl-4 mb-4">
+            <article class="card item-card h-100 border-0 shadow-sm">
+              <div class="card-body d-flex flex-column p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="item-icon" aria-hidden="true">✧</span>
+                  <span class="badge item-rarity rarity-{{ item.rarity|lower }}">{{ item.get_rarity_display }}</span>
+                </div>
+                <h2 class="h4"><a class="text-dark stretched-link" href="{% url 'compendium:items:item-detail' item.pk %}">{{ item.name }}</a></h2>
+                <p class="item-card-type mb-2">{{ item.get_type_display }}</p>
+                <p class="text-muted flex-grow-1">{{ item.description|truncatechars:135 }}</p>
+                <div class="item-card-meta border-top pt-3 mt-2">
+                  {% if item.damage %}<div><span>Damage</span><strong>{{ item.damage }}</strong></div>{% endif %}
+                  {% if item.protection %}<div><span>Protection</span><strong>{{ item.protection }}</strong></div>{% endif %}
+                  {% if item.effect %}<div><span>Effect</span><strong>{{ item.effect }}</strong></div>{% endif %}
+                  <div><span>Weight</span><strong>{{ item.weight }} lb</strong></div>
+                  <div><span>Price</span><strong>{{ item.price }}</strong></div>
+                </div>
+              </div>
+            </article>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm text-center py-5 px-3">
+        <div class="card-body">
+          <div class="item-icon item-empty-icon mb-3" aria-hidden="true">✧</div>
+          {% if clear %}
+            <h2 class="h3">No items found</h2>
+            <p class="text-muted mb-0">No item names match “{{ clear }}”. Try another search.</p>
+          {% else %}
+            <h2 class="h3">The collection is empty</h2>
+            <p class="text-muted mb-0">Items will appear here when they’re added to the library.</p>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+    {% include "includes/pagination.html" %}
+    </div>
+  </main>
+{% endblock %}
+
+{% block pagination %}{% endblock %}

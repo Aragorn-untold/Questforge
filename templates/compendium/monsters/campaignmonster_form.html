@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}<title>Monsters | {{ campaign.title }} | Questforge</title>{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  {{ base_monster_data|json_script:"base-monsters-data" }}
+  <script src="{% static 'js/campaign-base-autofill.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 monster-page">
+    <a href="{{ campaign.get_absolute_url }}" class="text-muted small">← Back to campaign</a>
+    <div class="monster-hero p-4 p-lg-5 mt-3 mb-4">
+      <span class="monster-eyebrow">Campaign bestiary</span>
+      <h1 class="display-4 mt-2 mb-2">Monsters for {{ campaign.title }}</h1>
+      <p class="mb-0">Keep track of the creatures your party may encounter.</p>
+    </div>
+
+    <section class="mb-5">
+      <h2 class="h4 mb-3">Campaign monsters</h2>
+      <div class="row">
+        {% for monster in campaign_monsters %}
+          <div class="col-md-6 col-xl-4 mb-3">
+            <article class="card monster-card h-100 border-0 shadow-sm">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h3 class="h5 mb-0">{{ monster.name }}</h3>
+                  <span class="badge badge-info">{{ monster.get_challenge_rating_display }}</span>
+                </div>
+                <p class="text-muted mb-3">{{ monster.get_type_display }} · {{ monster.get_alignment_display }}</p>
+                <div class="monster-stats border-top pt-3">
+                  <div><span class="text-muted">Hit points</span><strong>{{ monster.hit_points }}</strong></div>
+                  <div><span class="text-muted">Armor class</span><strong>{{ monster.armor_class }}</strong></div>
+                </div>
+                <p class="small text-muted mt-3 mb-0">{{ monster.abilities|truncatechars:160 }}</p>
+              </div>
+            </article>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="alert alert-light border mb-0">This campaign has no monsters yet. Add the first one below.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card border-0 shadow-sm campaign-form-card">
+      <div class="card-body p-4 p-lg-5">
+        <h2 class="h4 mb-1">Add a monster</h2>
+        <p class="text-muted mb-4">Create a campaign-specific creature or start from the monster library.</p>
+
+        <form method="post" class="campaign-form" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+          {% for field in form %}
+            <div class="form-group mb-4">
+              <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+              {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+          <div class="d-flex justify-content-between align-items-center border-top pt-4">
+            <a href="{{ campaign.get_absolute_url }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save campaign monster</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

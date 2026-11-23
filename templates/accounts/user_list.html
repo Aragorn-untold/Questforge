@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Players | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 user-directory-page">
+    <header class="directory-heading mb-4">
+      <span class="directory-eyebrow">The community</span>
+      <h1 class="display-4 mt-2 mb-2">Players</h1>
+      <p class="text-muted mb-0">Meet the adventurers and game masters of QuestForge.</p>
+    </header>
+    {% if user_list %}
+      <div class="row">
+        {% for player in user_list %}
+          <div class="col-md-6 col-xl-4 mb-3">
+            <a href="{% url 'accounts:user-detail' pk=player.pk %}" class="directory-user-card d-flex align-items-center p-3 h-100">
+              <span class="site-user-avatar mr-3" aria-hidden="true">{{ player.username|first|upper }}</span>
+              <span>
+                <strong class="d-block">{{ player.username }}</strong>
+                <small class="text-muted">Joined {{ player.date_joined|date:"M j, Y" }}</small>
+              </span>
+              <span class="directory-arrow ml-auto" aria-hidden="true">→</span>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-surface text-center p-5">
+        <h2 class="h4">No players to show</h2>
+      </div>
+    {% endif %}
+  </main>
+{% endblock %}

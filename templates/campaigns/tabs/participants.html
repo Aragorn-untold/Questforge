@@ -1,0 +1,26 @@
+<section id="campaign-party" class="campaign-detail-section">
+  <div class="campaign-section-heading">
+    <div>
+      <p class="campaign-section-eyebrow">The adventuring party</p>
+      <h2>Participants</h2>
+    </div>
+    <span class="campaign-section-count">{{ characters|length }}</span>
+  </div>
+  {% if characters %}
+    <div class="campaign-party-list">
+      {% for character in characters %}
+        <a class="campaign-party-member" href="{% url 'campaigns:characters:character-detail' campaign_pk=object.pk pk=character.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}">
+          <span class="campaign-detail-avatar" aria-hidden="true">{{ character.name|first|upper }}</span>
+          <span class="campaign-party-info">
+            <strong>{{ character.name }}</strong>
+            <small>{{ character.player.username }}{% if character.player_id == object.creator_id %} · Game master{% endif %}</small>
+          </span>
+          <span class="campaign-party-character">Level {{ character.level }} · {{ character.race.name }} {{ character.character_class.name }}</span>
+          <span class="campaign-party-arrow" aria-hidden="true">→</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="campaign-detail-empty">No characters have joined this campaign yet.</div>
+  {% endif %}
+</section>

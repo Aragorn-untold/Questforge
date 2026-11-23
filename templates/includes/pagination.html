@@ -1,0 +1,40 @@
+{% load query_transform %}
+{% if is_paginated %}
+  <nav class="site-pagination" aria-label="Pagination">
+    <div class="site-pagination-summary">
+      <span class="site-pagination-label">Page</span>
+      <strong>{{ page_obj.number }}</strong>
+      <span class="site-pagination-of">of {{ paginator.num_pages }}</span>
+    </div>
+
+    <ul class="pagination mb-0">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link site-pagination-link" href="?{% query_transform request page=page_obj.previous_page_number %}" aria-label="Previous page">
+            <span aria-hidden="true">←</span><span class="site-pagination-link-text">Previous</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link site-pagination-link" aria-disabled="true">
+            <span aria-hidden="true">←</span><span class="site-pagination-link-text">Previous</span>
+          </span>
+        </li>
+      {% endif %}
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link site-pagination-link" href="?{% query_transform request page=page_obj.next_page_number %}" aria-label="Next page">
+            <span class="site-pagination-link-text">Next</span><span aria-hidden="true">→</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link site-pagination-link" aria-disabled="true">
+            <span class="site-pagination-link-text">Next</span><span aria-hidden="true">→</span>
+          </span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

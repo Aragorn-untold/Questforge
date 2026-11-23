@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}<title>{% if object %}Edit{% else %}Add{% endif %} campaign note | QuestForge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-5 campaign-note-form-page">
+    <a class="campaign-back-link" href="{{ campaign.get_absolute_url }}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}#campaign-notes">← Back to {{ campaign.title }}</a>
+    <section class="campaign-note-form-card mt-4">
+      <p class="campaign-section-eyebrow">{{ campaign.title }}</p>
+      <h1>{% if object %}Edit note{% else %}Add a campaign note{% endif %}</h1>
+      <p class="campaign-note-form-help">Share a clue, decision, or moment with the campaign’s players.</p>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label for="{{ form.content.id_for_label }}">Note</label>
+        {{ form.content }}
+        {{ form.content.errors }}
+        <div class="campaign-note-form-actions">
+          <button class="btn btn-primary" type="submit">Save note</button>
+          <a class="btn btn-outline-secondary" href="{{ campaign.get_absolute_url }}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}#campaign-notes">Cancel</a>
+        </div>
+      </form>
+    </section>
+  </main>
+{% endblock %}

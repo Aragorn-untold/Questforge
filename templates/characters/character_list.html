@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Characters | {{ campaign.title }} | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 character-directory-page">
+    {% if return_profile_user %}
+      <a href="{% url 'accounts:user-detail' pk=return_profile_user.pk %}" class="text-muted small">← Back to profile</a>
+    {% else %}
+      <a href="{{ campaign.get_absolute_url }}" class="text-muted small">← Back to campaign</a>
+    {% endif %}
+    <header class="directory-heading d-flex flex-column flex-md-row justify-content-between align-items-md-end mt-3 mb-4">
+      <div>
+        <span class="directory-eyebrow">Party roster · {{ campaign.title }}</span>
+        <h1 class="display-4 mt-2 mb-0">Characters</h1>
+      </div>
+      {% if user.is_authenticated and not user_character %}
+        <a href="{% url 'campaigns:characters:character-create' campaign_pk=campaign.pk %}" class="btn btn-primary mt-3">Join this campaign</a>
+      {% endif %}
+    </header>
+
+    {% if object_list %}
+      <div class="row">
+        {% for character in object_list %}
+          <div class="col-md-6 col-xl-4 mb-3">
+            <a href="{% url 'campaigns:characters:character-detail' pk=character.pk campaign_pk=campaign.pk %}{% if return_profile_user %}?from_profile={{ return_profile_user.pk }}{% endif %}" class="character-roster-card d-block h-100">
+              <div class="d-flex align-items-center mb-3">
+                <span class="site-user-avatar mr-3" aria-hidden="true">{{ character.name|first|upper }}</span>
+                <div>
+                  <h2 class="h5 mb-1">{{ character.name }}</h2>
+                  <span class="text-muted small">{{ character.player.username }}</span>
+                </div>
+                <span class="badge badge-light ml-auto">Level {{ character.level }}</span>
+              </div>
+              <div class="character-roster-meta border-top pt-3">
+                <span>{{ character.race.name }}</span>
+                <span>{{ character.character_class.name }}</span>
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-surface text-center p-5">
+        <div class="auth-mark mb-3" aria-hidden="true">✧</div>
+        <h2 class="h3">The party is waiting</h2>
+        <p class="text-muted mb-0">No characters have joined this campaign yet.</p>
+      </div>
+    {% endif %}
+  </main>
+{% endblock %}

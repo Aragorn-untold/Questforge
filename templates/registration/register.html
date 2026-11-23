@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Create an account | QuestForge</title>{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+<main class="register-page">
+  <section class="register-story" aria-labelledby="register-story-title">
+    <a class="register-brand" href="{% url 'home' %}" aria-label="QuestForge home">
+      <span class="register-brand-mark" aria-hidden="true">⬡</span>
+      <span><strong>QUESTFORGE</strong><small>CAMPAIGN MANAGER</small></span>
+    </a>
+    <div class="register-story-content">
+      <div class="register-die-wrap" aria-hidden="true">
+        <span class="register-die-orbit"></span>
+        <svg class="register-die" viewBox="0 0 260 250" focusable="false">
+          <g stroke="#d6b15f" stroke-linejoin="round" stroke-width="1.5">
+            <polygon points="105,210 105,129 41,141" fill="#171817" />
+            <polygon points="105,210 105,129 189,168" fill="#201d16" />
+            <polygon points="105,210 189,168 176,204" fill="#342b1c" />
+            <polygon points="155,50 84,56 176,73" fill="#4b4028" />
+            <polygon points="105,129 41,141 84,56" fill="#262319" />
+            <polygon points="105,129 189,168 176,73" fill="#3a3221" />
+            <polygon points="105,129 84,56 176,73" fill="#60502c" />
+            <polygon points="219,119 189,168 176,204" fill="#0c0f11" />
+            <polygon points="219,119 189,168 176,73" fill="#282319" />
+            <polygon points="41,141 84,56 155,50 176,73 219,119 176,204 105,210" fill="none" />
+          </g>
+        </svg>
+      </div>
+      <p class="register-eyebrow">Your table is waiting</p>
+      <h1 id="register-story-title">Every legend<br>starts with a hero.</h1>
+      <p class="register-story-copy">Bring campaigns, characters, and treasures together in one place. Gather your party and start shaping the story.</p>
+    </div>
+    <p class="register-story-footnote">✧ &nbsp; A home for your next great adventure</p>
+  </section>
+
+  <section class="register-panel" aria-labelledby="register-title">
+    <div class="register-panel-inner">
+      <span class="register-panel-emblem" aria-hidden="true">⬡</span>
+      <h2 id="register-title">Create your account</h2>
+      <p class="register-subtitle">Join the table — it’s free.</p>
+
+      {% if messages %}
+        {% for message in messages %}<div class="alert alert-{{ message.tags }}">{{ message }}</div>{% endfor %}
+      {% endif %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+      <form method="post" class="register-form">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="register-field{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="register-input-wrap">
+              <span class="register-field-icon" aria-hidden="true">
+                {% if field.name == "username" %}♙{% elif field.name == "email" %}✉{% else %}⌑{% endif %}
+              </span>
+              {{ field }}
+            </div>
+            {% if field.help_text %}<div class="register-help">{{ field.help_text|safe }}</div>{% endif %}
+            {% for error in field.errors %}<div class="register-error">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="register-submit"><span aria-hidden="true">♙</span> Create account</button>
+      </form>
+
+      <p class="register-login-prompt">Already have an account? <a href="{% url 'accounts:login' %}">Log in</a></p>
+    </div>
+  </section>
+</main>
+{% endblock %}

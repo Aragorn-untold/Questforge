@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}<title>{% if object %}Edit{% else %}Create{% endif %} campaign | Questforge</title>{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 campaign-form-page">
+    <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'campaigns:campaign-list' %}{% endif %}" class="text-muted small">
+      ← {% if object %}Back to campaign{% else %}Back to campaigns{% endif %}
+    </a>
+
+    <div class="campaign-form-hero mt-3 mb-4 p-4 p-lg-5">
+      <span class="campaign-form-eyebrow">{% if object %}Campaign settings{% else %}A new adventure{% endif %}</span>
+      <h1 class="display-4 mt-2 mb-2">{% if object %}Edit your campaign{% else %}Create a campaign{% endif %}</h1>
+      <p class="mb-0">{% if object %}Update the details of your world.{% else %}Give your world a name and a story. Your players can join once it’s ready.{% endif %}</p>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm campaign-form-card">
+          <div class="card-body p-4 p-lg-5">
+            <h2 class="h4 mb-1">Campaign details</h2>
+            <p class="text-muted mb-4">Start with the essentials; you can shape the rest as you go.</p>
+
+            <form method="post" class="campaign-form" novalidate>
+              {% csrf_token %}
+              {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+              {% for field in form %}
+                <div class="form-group mb-4">
+                  <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
+                  {{ field }}
+                  {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+                  {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+              {% endfor %}
+
+              {% if not object %}
+                <div class="campaign-creator-note mb-4">
+                  <span><small class="text-muted d-block">Game master</small><strong>{{ user.username }}</strong></span>
+                  <span class="badge badge-light ml-auto">You</span>
+                </div>
+              {% endif %}
+
+              <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center border-top pt-4">
+                <span class="small text-muted mb-3 mb-sm-0">{% if object %}Only you can manage this campaign.{% else %}You’ll be set as the game master.{% endif %}</span>
+                <button type="submit" class="btn btn-primary btn-lg px-4">{% if object %}Save changes{% else %}Create campaign{% endif %}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <aside class="col-lg-4 mb-4">
+        <div class="card border-0 shadow-sm campaign-form-side-card">
+          <div class="card-body p-4">
+            <div class="campaign-form-icon mb-3" aria-hidden="true">✦</div>
+            <h2 class="h5">A world of your own</h2>
+            <p class="text-muted mb-0">Campaigns keep the story, characters, and special items for your table together in one place.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+{% endblock %}

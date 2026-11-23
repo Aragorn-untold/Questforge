@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}<title>Quests | {{ campaign.title }} | Questforge</title>{% endblock %}
+
+{% block scripts %}
+  {{ block.super }}
+  {{ base_quests_data|json_script:"base-quests-data" }}
+  <script src="{% static 'js/campaign-base-autofill.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  <main class="container py-4 py-lg-5 quest-page">
+    <a href="{{ campaign.get_absolute_url }}" class="text-muted small">← Back to campaign</a>
+    <div class="quest-hero p-4 p-lg-5 mt-3 mb-4">
+      <span class="quest-eyebrow">Campaign adventures</span>
+      <h1 class="display-4 mt-2 mb-2">Quests for {{ campaign.title }}</h1>
+      <p class="mb-0">Track the adventures and challenges in this campaign.</p>
+    </div>
+
+    <section class="mb-5">
+      <h2 class="h4 mb-3">Campaign quests</h2>
+      <div class="row">
+        {% for quest in campaign_quests %}
+          <div class="col-md-6 col-xl-4 mb-3">
+            <article class="card quest-card h-100 border-0 shadow-sm">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h3 class="h5 mb-0">{{ quest.title }}</h3>
+                  <span class="badge badge-info">{{ quest.get_difficulty_rating_display }}</span>
+                </div>
+                <p class="text-muted">{{ quest.description|truncatechars:180 }}</p>
+                <p class="small mb-1"><strong>Recommended level:</strong> {{ quest.level_recommendation }}</p>
+                <p class="small mb-0"><strong>Reward:</strong> {{ quest.reward_description|truncatechars:120 }}</p>
+              </div>
+            </article>
+          </div>
+        {% empty %}
+          <div class="col-12">
+            <div class="alert alert-light border mb-0">This campaign has no quests yet. Add the first one below.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card border-0 shadow-sm campaign-form-card">
+      <div class="card-body p-4 p-lg-5">
+        <h2 class="h4 mb-1">Add a quest</h2>
+        <p class="text-muted mb-4">Create a campaign-specific quest or start from a quest in the library.</p>
+
+        <form method="post" class="campaign-form" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+          {% for field in form %}
+            <div class="form-group mb-4">
+              <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+              {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+          <div class="d-flex justify-content-between align-items-center border-top pt-4">
+            <a href="{{ campaign.get_absolute_url }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save campaign quest</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

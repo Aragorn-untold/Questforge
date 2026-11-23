@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Log in | Questforge</title>{% endblock %}
+
+{% block content %}
+<main class="container py-5 auth-page">
+  <div class="auth-card card border-0 shadow-sm mx-auto">
+    <div class="card-body p-4 p-lg-5">
+      <span class="directory-eyebrow">Welcome back</span>
+      <h1 class="h2 mt-2 mb-2">Log in</h1>
+      <p class="text-muted mb-4">Return to your campaigns and characters.</p>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if form.errors %}
+  <p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+{% if next %}
+  <p class="alert alert-info">Please log in to continue to the requested page.</p>
+{% endif %}
+
+<form method="post" action="{% url 'accounts:login' %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <input type="submit" value="Log in" class="btn btn-primary" />
+  <input type="hidden" name="next" value="{{ next }}" />
+</form>
+<p class="login-register-prompt mt-4 mb-0 text-center">
+  Don’t have an account? <a href="{% url 'accounts:user-register' %}">Create one</a>
+</p>
+</div>
+</div>
+</main>
+{% endblock %}
